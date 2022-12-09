@@ -1,0 +1,3 @@
+# Frontend app specific gitignore
+# Pycharm settings
+/.idea/
