@@ -232,3 +232,20 @@ button.no-defaults {
     border: none;
     outline: none;
 }
+
+.margin-0-auto {
+    margin: 0 auto;
+}
+
+.m-scrollbar::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+}
+
+.m-scrollbar::-webkit-scrollbar-track {
+    background: #7e4d8f40;
+}
+
+.m-scrollbar::-webkit-scrollbar-thumb {
+    background: #7e4d8f;
+}

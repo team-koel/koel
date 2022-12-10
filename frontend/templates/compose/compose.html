@@ -3,11 +3,15 @@
 {% block content %}
     <div class="composer">
         <!-- Playground -->
-        <div class="playground">
+        <div class="playground m-scrollbar">
             <!-- Step 1: Type -->
             <button class="accordion" id="step1">Step 1: Project type</button>
             <div class="panel" id="a1">
-                <div class="switch width-100" id="type">
+                <div class="help-text">
+                    Select the type of object you would like to compose.
+                </div>
+
+                <div class="switch width-100 mt2" id="type">
                     <button class="no-defaults" id="email">Email</button>
                     <button class="no-defaults" id="poster">Poster</button>
                 </div>
@@ -20,7 +24,7 @@
             <button class="accordion" id="step2">Step 2: Workflow</button>
             <div class="panel">
                 <div class="help-text">
-                    Picking a workflow helps compose more relevant sections, text, and images.
+                    Pick the most-appropriate purpose. You'll be able to change this later.
                 </div>
 
                 <div id="workflow_choices" class="flex-choices">
@@ -56,19 +60,25 @@
             </div>
 
             <!-- Step 4: Compose -->
-            <button class="accordion" id="step4">Step 4: Compose</button>
+            <button class="accordion with-image" id="step4">
+                <span>Step 4: Compose</span>
+                <span class="inline-image">
+                    <img id="compose_spinner" src="{{ url_for('static', filename='icons/spinner.gif') }}" alt="working" class="display-none" height="17px" />
+                </span>
+            </button>
             <div class="panel">
-                As you compose your project, options show up here.
             </div>
         </div>
 
         <!-- Canvas -->
-        <div class="canvas">
+        <div class="canvas m-scrollbar">
+            <div id="canvas_area" class="canvas-area">
 
+            </div>
         </div>
 
         <!-- Tools -->
-        <div class="tools">
+        <div class="tools m-scrollbar">
             <div id="tools_area" class="tools-area">
                 <!-- Page setup (size, color, gradients, etc.) -->
                 <div class="heading">
@@ -85,13 +95,13 @@
                 <div class="heading">
                     Content
                 </div>
-                <button draggable="true" class="no-defaults" id="tool_text">
+                <button draggable="true" class="no-defaults drag-tool" id="tool_text">
                     <img draggable="false" src="{{ url_for('static', filename='icons/text.svg') }}" width="40px" height="40px" alt="text" />
                     <span class="description">
                         Text
                     </span>
                 </button>
-                <button draggable="true" class="no-defaults" id="tool_button">
+                <button draggable="true" class="no-defaults drag-tool" id="tool_image">
                     <img draggable="false" src="{{ url_for('static', filename='icons/image.svg') }}" width="40px" height="40px" alt="image" />
                     <span class="description">
                         Image
@@ -216,6 +226,7 @@
             width: 420px;
             height: 100%;
             background-color: #fdfdfd;
+            overflow: hidden;
         }
 
         .playground .panel {
@@ -397,6 +408,31 @@
         .form-submit:hover {
             background: #5b6f6e;
         }
+
+        .inline-image {
+            margin-left: 10px;
+        }
+
+        .inline-image > img {
+            margin-bottom: -2px;
+        }
+
+        .canvas-area {
+            width: 0;
+            height: 0;
+            margin: 40px auto;
+            background-image: linear-gradient(#ffdda4, #ffbe72);
+            position: relative;
+        }
+
+        .canvas-area > div, .canvas-area > img {
+            position: absolute;
+        }
+
+        .canvas-area > div:hover, .canvas-area > img:hover {
+            outline: 1px dotted #555555;
+        }
+
     </style>
 {% endblock head %}
 
@@ -583,6 +619,8 @@
         }
 
         /* Compose */
+        let composeSpinner = $('#compose_spinner');
+        let canvasArea = $('#canvas_area');
 
         compose.on('click', function() {
             let mTitle = projectTitle.val();
@@ -628,7 +666,95 @@
             repr['title'] = mTitle;
             repr['description'] = mDescription;
 
+            // Close sections 1, 2, 3, and open section 4, show a spinner at section 4
+            if (step1.hasClass('active')) {
+                step1.click();
+            }
+            if (step2.hasClass('active')) {
+                step2.click();
+            }
+            if (step3.hasClass('active')) {
+                step3.click();
+            }
+
+            if (!step4.hasClass('active')) {
+                step4.click();
+            }
+
+            showSpinner();
+            doInitialCompose();
+            hideSpinner();
         });
+
+        function showSpinner() {
+            composeSpinner.removeClass('display-none');
+        }
+
+        function hideSpinner() {
+            composeSpinner.addClass('display-none');
+        }
+
+        function doInitialCompose() {
+            if (repr['type'] === TYPE_POSTER) {
+                canvasArea.css({'width': POSTER_WIDTH + 'px', 'height': POSTER_HEIGHT + 'px'});
+            } else {
+                canvasArea.css({'width': EMAIL_WIDTH + 'px', 'height': '100%'});
+            }
+        }
+
+        /* Handling dragging */
+        let elementIDCount = 0;
+
+        // Spawn an element of the type of tool that is dropped onto the canvas
+        // https://web.dev/drag-and-drop/#:~:text=To%20make%20an%20object%20draggable,any%20markup%20on%20your%20page.
+        let draggableTools = document.querySelectorAll('.drag-tool');
+        draggableTools.forEach(function (draggableTool) {
+            draggableTool.addEventListener('dragstart', handleDragStart);
+            draggableTool.addEventListener('dragend', handleDragEnd);
+        });
+
+        function handleDragStart(e) {
+        }
+
+        function handleDragEnd(e) {
+            elementIDCount += 1;
+            let canvasOffset = canvasArea.offset()
+            let mTop = e.y - canvasOffset['top'];
+            let mLeft = e.x - canvasOffset['left'];
+
+            if (e.target.id === 'tool_text') {
+                /* Append a draggable text element at this position */
+                let mTextArea = $('<div>', {
+                    'id': 'eid_' + elementIDCount,
+                    'style': 'top: ' + mTop + 'px; left: ' + mLeft + 'px; padding: 20px;',
+                    'text': 'PLACEHOLDER ' + elementIDCount,
+                    'class': 'text-container'
+                });
+                canvasArea.append(mTextArea);
+                mTextArea.draggable({
+                    containment: '#canvas_area',
+                    scroll: false
+                });
+            }
+
+            if (e.target.id === 'tool_image') {
+                /* Append a draggable image element at this position */
+                let mImageArea = $('<img />', {
+                    'id': 'eid_' + elementIDCount,
+                    'style': 'top: ' + mTop + 'px; left: ' + mLeft + 'px;',
+                    'text': 'Image ' + elementIDCount,
+                    'class': 'image-container',
+                    'width': '100px',
+                    'height': '100px',
+                    'src': 'https://storage.googleapis.com/random-public-assets/koel-composer/image_placeholder_color.svg'
+                });
+                canvasArea.append(mImageArea);
+                mImageArea.draggable({
+                    containment: '#canvas_area',
+                    scroll: false
+                });
+            }
+        }
 
     </script>
 {% endblock foot %}
