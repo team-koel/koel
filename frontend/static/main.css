@@ -1,0 +1,234 @@
+@charset "utf-8";
+/*
+Author: Jehoshaph Akshay Chandran
+ */
+
+
+html {
+    margin: 0;
+    padding: 0;
+}
+
+
+body {
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    height: 100%;
+    font-family: 'Nunito Sans', sans-serif;
+    opacity: 0.87;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 22px;
+    letter-spacing: 0.5px;
+    color: #30002b;
+    background: #f6f2ff;
+}
+
+.color-secondary {
+    color: #5b6f6e;
+}
+
+.serif {
+    font-family: 'Merriweather', serif;
+}
+
+.site-wrap {
+    /* Style applied on the html body tag */
+    background-color: #f5fafc;
+}
+
+.bg-white {
+    background: #ffffff;
+}
+
+.medium-emphasis {
+    opacity: 0.6;
+}
+
+.disabled {
+    opacity: 0.38;
+}
+
+h1 {
+    font-size: 48px;
+    line-height: 64px;
+    font-weight: 400;
+    color: #71356b;
+}
+
+h2 {
+    font-size: 36px;
+    line-height: 44px;
+    font-weight: 400;
+    color: #71356b;
+}
+
+h3 {
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 34px;
+    color: #71356b;
+}
+
+h4 {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 24px;
+    margin: 0;
+    color: #71356b;
+}
+
+header {
+    background: #ffffff;
+    width: auto;
+    padding: 10px 15px;
+    line-height: 1;
+}
+
+.container {
+    max-width: 1470px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: inherit;
+}
+
+.text-align-center {
+    text-align: center;
+}
+
+.mt1 {
+    margin-top: 10px;
+}
+
+.mt2 {
+    margin-top: 20px;
+}
+
+.mt3 {
+    margin-top: 30px;
+}
+
+.mt4 {
+    margin-top: 40px;
+}
+
+.mt5 {
+    margin-top: 50px;
+}
+
+.mt6 {
+    margin-top: 60px;
+}
+
+.mb1 {
+    margin-bottom: 10px;
+}
+
+.mb2 {
+    margin-bottom: 20px;
+}
+
+.mb3 {
+    margin-bottom: 30px;
+}
+
+.mb5 {
+    margin-bottom: 50px;
+}
+
+.ml1 {
+    margin-left: 10px;
+}
+
+.px2 {
+    padding: 20px;
+}
+
+.display-none {
+    display: none;
+}
+
+button {
+    text-decoration: none;
+    font-size: 18px;
+    line-height: 28px;
+    cursor: pointer;
+}
+
+.toggle-buttons > button {
+    padding: 12px 20px;
+    border-radius: 4px;
+    color: #888888;
+    background: none;
+    margin: 0;
+    border: none;
+    font-weight: 600;
+}
+
+.toggle-buttons > button:hover {
+    color: #555555;
+}
+
+.toggle-buttons > button.selected {
+    background: #f9f6ff;
+    color: #71356b;
+}
+
+.section-padding {
+    padding: 30px
+}
+
+header > .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header .nav {
+    display: flex;
+    gap: 10px;
+}
+
+.nav > a {
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 600;
+    color: #888888;
+}
+
+.nav > a.selected {
+    font-weight: 800;
+    color: #71356b;
+}
+
+.content {
+    padding: 10px;
+}
+
+.promo-text > .content {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+a.image-link {
+    text-decoration: none;
+    line-height: 1;
+}
+
+.site-logo {
+    font-weight: bolder;
+    display: flex;
+    align-items: center;
+}
+
+button.no-defaults {
+    text-decoration: none;
+    margin: 0;
+    padding: 0;
+
+    background: none;
+    border: none;
+    outline: none;
+}

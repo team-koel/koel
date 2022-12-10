@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta name="author" content="AnnotateIt">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0077c1">
+
+    <link href="https://fonts.googleapis.com/css?family=Merriweather|Nunito+Sans|Source+Code+Pro&display=swap"
+          rel="stylesheet"/>
+
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='main.css') }}?v=202212100206" />
+
+    <title>{{ page_name|default('Koel') }}</title>
+
+    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='icons/favicon.png') }}" />
+
+    {% block head %}
+    {% endblock head %}
+</head>
+
+<body>
+    <header>
+        <a class="image-link site-logo" href="{{ url_for('home') }}">
+            <img src="{{ url_for('static', filename='icons/logo.svg') }}" width="28px" height="28px" alt="logo" />
+            <span class="ml1">Koel <sup>ai</sup></span>
+        </a>
+    </header>
+
+    {% block content %}
+    {% endblock content %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    {% block foot %}
+    {% endblock foot %}
+</body>
+

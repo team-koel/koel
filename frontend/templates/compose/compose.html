@@ -1,0 +1,269 @@
+{% extends 'master/master.html' %}
+
+{% block content %}
+    <div class="composer">
+        <!-- Playground -->
+        <div class="playground">
+            <!-- Step 1: Type -->
+            <button class="accordion" id="step1">Step 1: Project type</button>
+            <div class="panel" id="a1">
+                Choose between email or poster
+            </div>
+
+            <!-- Step 2: Title, Description -->
+            <button class="accordion" id="step2">Step 2: Basic details</button>
+            <div class="panel">
+                Give a quick description of the project
+            </div>
+
+            <!-- Step 3: Templates -->
+            <button class="accordion" id="step3">Step 3: (Optional) Pick a template</button>
+            <div class="panel">
+                Choose from amongst some default templates.
+            </div>
+
+            <!-- Step 4: Compose -->
+            <button class="accordion" id="step4">Step 4: Compose</button>
+            <div class="panel">
+                As you compose your project, options show up here.
+            </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="canvas">
+
+        </div>
+
+        <!-- Tools -->
+        <div class="tools">
+            <div id="tools_area" class="tools-area">
+                <!-- Page setup (size, color, gradients, etc.) -->
+
+                <!-- Content (draggable) -->
+                <div class="heading">
+                    Content
+                </div>
+                <button draggable="true" class="no-defaults" id="tool_text">
+                    <img draggable="false" src="{{ url_for('static', filename='icons/text.svg') }}" width="40px" height="40px" alt="text" />
+                    <span class="description">
+                        Text
+                    </span>
+                </button>
+                <button draggable="true" class="no-defaults" id="tool_button">
+                    <img draggable="false" src="{{ url_for('static', filename='icons/image.svg') }}" width="40px" height="40px" alt="image" />
+                    <span class="description">
+                        Image
+                    </span>
+                </button>
+            </div>
+            <div class="tools-menu">
+                <button id="edit_doc" class="no-defaults">
+                    <img src="{{ url_for('static', filename='icons/edit_document.svg') }}" width="24px" height="24px" alt="edit document" />
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block head %}
+    <style>
+        header {
+            border-bottom: 1px solid gray;
+            z-index: 2;
+        }
+
+
+        .accordion {
+            font-size: 16px;
+            line-height: 20px;
+            padding: 12px;
+            width: 100%;
+
+            text-align: left;
+
+            border-bottom: 1px solid #ababab;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            outline: none;
+            background: none;
+            text-decoration: none;
+            transition: 0.4s;
+        }
+
+        .accordion:hover {
+            background-color: #cccccc;
+        }
+
+        .accordion:after {
+            content: '\02795';
+            font-size: 13px;
+            color: #777777;
+            float: right;
+            margin-left: 5px;
+        }
+
+        .accordion.active:after {
+            content: '\2796';
+        }
+
+        .panel {
+            padding: 0 18px;
+            background-color: white;
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.2s ease-out;
+        }
+
+        .composer {
+            width: 100vw;
+            height: calc(100vh - 49px);
+            background: #dcdcdc;
+
+            display: flex;
+            flex-direction: row;
+
+        }
+
+        .canvas {
+            flex-grow: 1;
+            height: 100%;
+            background-color: #232323;
+
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        .playground {
+            width: 420px;
+            height: 100%;
+            background-color: #fdfdfd;
+        }
+
+        .tools {
+            min-width: 57px;
+            height: 100%;
+            display: flex;
+        }
+
+        .tools-area {
+            width: 0;
+
+            transition: width 0.5s ease;
+
+            background-color: #fdfdfd;
+        }
+
+        .tools-area.open {
+            width: 223px;
+        }
+
+        .tools-menu {
+            width: 57px;
+            background: #fafafa;
+            height: 100%;
+            border-left: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .tools-menu > button {
+            width: 57px;
+            height: 57px;
+            border-bottom: 2px solid #fafafa;
+        }
+
+        .tools-menu > button:hover {
+            border-bottom: 2px solid #71356b;
+            background: #efefef;
+        }
+
+        .tools-menu > button.selected {
+            border-bottom: 2px solid #71356b;
+            background: #71356b80;
+        }
+
+        .tools-menu > button > img {
+            margin: auto;
+        }
+
+        .tools-area > button {
+            width: 80px;
+            height: 80px;
+            margin: 30px auto;
+
+            border: 1px solid gray;
+            border-radius: 3px;
+
+            display: none;
+            flex-direction: column;
+
+            justify-content: center;
+            align-items: center;
+
+            gap: 8px;
+        }
+
+        .tools-area.open > button {
+            display: flex;
+        }
+
+        .tools-area > button:hover {
+            box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .tools-area > .heading {
+            font-size: 16px;
+            padding: 20px;
+            display: none;
+        }
+
+        .tools-area.open > .heading {
+            display: block;
+        }
+
+        .tools-area .description {
+            font-size: 14px;
+            line-height: 18px;
+            color: #232323;
+        }
+    </style>
+{% endblock head %}
+
+{% block foot %}
+    <script>
+        let POSTER_WIDTH = 570;
+        let POSTER_HEIGHT = 880;
+        let EMAIL_WIDTH = 570;
+
+        /* Tools panel */
+        let editDoc = $('#edit_doc');
+        let toolsArea = $('#tools_area');
+        editDoc.on('click', function() {
+            console.log('clicked');
+            if (editDoc.hasClass('selected')) {
+                editDoc.removeClass('selected');
+                toolsArea.removeClass('open');
+            } else {
+                console.log('expanding');
+                editDoc.addClass('selected');
+                toolsArea.addClass('open');
+            }
+        });
+
+        /* Accordion */
+        $('.accordion').on('click', function() {
+            $(this).toggleClass('active');
+            let panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+                console.log(panel.style.maxHeight + ' max height');
+                panel.style.maxHeight = null;
+            } else {
+                console.log(panel.scrollHeight);
+                panel.style.maxHeight = panel.scrollHeight + 'px';
+            }
+        });
+
+        $(function() {
+            step1.click();
+        });
+    </script>
+{% endblock foot %}
