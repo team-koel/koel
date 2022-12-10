@@ -67,6 +67,110 @@
                 </span>
             </button>
             <div class="panel">
+                <div class="display-none area-form" id="text_area_form">
+                    <div class="form-input">
+                        <label for="text_content">
+                            Content
+                        </label>
+                        <textarea id="text_content"></textarea>
+                    </div>
+                    <ul class="content-suggestions" id="content_suggestions">
+                        <li>Suggest 1</li>
+                        <li>Suggest 2</li>
+                        <li>Suggest 3</li>
+                        <li>Suggest 4</li>
+                    </ul>
+                    <div class="form-row">
+                        <div class="form-input">
+                            <label for="text_size">
+                                Font size (px)
+                            </label>
+                            <input id="text_size" type="number" min="0" />
+                        </div>
+                        <div class="form-input">
+                            <label for="text_weight">
+                                Font weight
+                            </label>
+                            <input id="text_weight" type="number" min="0" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-input">
+                            <label for="text_background">
+                                Background color
+                            </label>
+                            <input id="text_background" type="text" maxlength="20" class="short" />
+                        </div>
+
+                        <div class="form-input">
+                            <label for="text_color">
+                                Text color
+                            </label>
+                            <input id="text_color" type="text" maxlength="20" class="short" />
+                        </div>
+                    </div>
+                    <div class="form-input">
+                        <label for="text_rotation">
+                            Transform (rotation)
+                        </label>
+                        <input id="text_rotation" type="text" maxlength="100" />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-input">
+                            <label for="text_width">
+                                Width (px)
+                            </label>
+                            <input id="text_width" type="number" />
+                        </div>
+                        <div class="form-input">
+                            <label for="text_height">
+                                Height (px)
+                            </label>
+                            <input id="text_height" type="number" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-input">
+                            <label for="text_align">
+                                Text align (left, center, right)
+                            </label>
+                            <select id="text_align">
+                                <option value="left">Left</option>
+                                <option value="center">Center</option>
+                                <option value="right">Right</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="display-none area-form" id="image_area_form">
+                    <div class="form-input">
+                        <label for="image_content">
+                            Image source
+                        </label>
+                        <input id="image_content" type="text" maxlength="512" />
+                    </div>
+                    <div class="form-input">
+                        <label for="image_rotation">
+                            Transform (rotation)
+                        </label>
+                        <input id="image_rotation" type="text" maxlength="100" />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-input">
+                            <label for="image_width">
+                                Width (px)
+                            </label>
+                            <input id="image_width" type="number" />
+                        </div>
+                        <div class="form-input">
+                            <label for="image_height">
+                                Height (px)
+                            </label>
+                            <input id="image_height" type="number" />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -384,6 +488,10 @@
             line-height: 18px;
         }
 
+        .form-input > input.short {
+            width: 140px;
+        }
+
         .form-input > textarea {
             height: 86px;
         }
@@ -433,6 +541,45 @@
             outline: 1px dotted #555555;
         }
 
+        .area-form {
+            padding-left: 14px;
+        }
+
+        .form-input > input[type="number"] {
+            width: 100px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            align-content: flex-start;
+        }
+
+        .content-suggestions {
+            margin-top: 20px;
+            list-style: none;
+            text-decoration: none;
+            padding-left: 0;
+            margin-left: 0;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .content-suggestions > li {
+            margin-right: 14px;
+            padding: 14px 18px;
+            font-size: 14px;
+            line-height: 18px;
+            background-color: #71356b;
+            color: #efefef;
+            margin-bottom: 6px;
+            cursor: pointer;
+        }
+
+        .image-container {
+            object-fit: contain;
+        }
     </style>
 {% endblock head %}
 
@@ -666,7 +813,7 @@
             repr['title'] = mTitle;
             repr['description'] = mDescription;
 
-            // Close sections 1, 2, 3, and open section 4, show a spinner at section 4
+            // Close sections 1, 2, 3, and open section 4, show a spinner at section 4, show the tools
             if (step1.hasClass('active')) {
                 step1.click();
             }
@@ -679,6 +826,10 @@
 
             if (!step4.hasClass('active')) {
                 step4.click();
+            }
+
+            if (!editDoc.hasClass('selected')) {
+                editDoc.click();
             }
 
             showSpinner();
@@ -701,6 +852,9 @@
                 canvasArea.css({'width': EMAIL_WIDTH + 'px', 'height': '100%'});
             }
         }
+
+        /* Handling page tools */
+        // TODO: Handle background settings etc.
 
         /* Handling dragging */
         let elementIDCount = 0;
@@ -727,7 +881,7 @@
                 let mTextArea = $('<div>', {
                     'id': 'eid_' + elementIDCount,
                     'style': 'top: ' + mTop + 'px; left: ' + mLeft + 'px; padding: 20px;',
-                    'text': 'PLACEHOLDER ' + elementIDCount,
+                    'text': 'New text area ' + elementIDCount,
                     'class': 'text-container'
                 });
                 canvasArea.append(mTextArea);
@@ -735,6 +889,7 @@
                     containment: '#canvas_area',
                     scroll: false
                 });
+                mTextArea.click();
             }
 
             if (e.target.id === 'tool_image') {
@@ -742,7 +897,6 @@
                 let mImageArea = $('<img />', {
                     'id': 'eid_' + elementIDCount,
                     'style': 'top: ' + mTop + 'px; left: ' + mLeft + 'px;',
-                    'text': 'Image ' + elementIDCount,
                     'class': 'image-container',
                     'width': '100px',
                     'height': '100px',
@@ -753,7 +907,233 @@
                     containment: '#canvas_area',
                     scroll: false
                 });
+                mImageArea.click();
             }
+        }
+
+        let selectedContainer = null;
+
+        // Form elements
+        let textContent = $('#text_content');
+        let textSize = $('#text_size');
+        let textWeight = $('#text_weight');
+        let textBackground = $('#text_background');
+        let textRotation = $('#text_rotation');
+        let textWidth = $('#text_width');
+        let textHeight = $('#text_height');
+        let textAlign = $('#text_align');
+        let textColor = $('#text_color');
+
+        canvasArea.on('click', '.text-container', function() {
+            // Clicked a text container
+            let thisElement = $(this);
+
+            commonStuff(thisElement);
+
+            $('#text_area_form').removeClass('display-none');
+            toggleComposePanel();
+
+            // Filling in with the current content
+            textContent.val(thisElement.text());
+            let cFontSize = thisElement.css('font-size');
+            textSize.val(cFontSize.split('px')[0]);
+            textWeight.val(thisElement.css('font-weight'));
+            textBackground.val(thisElement.css('background-color'));
+            textColor.val(thisElement.css('color'));
+            textRotation.val(thisElement.css('transform'));
+            textWidth.val(thisElement.css('width').split('px')[0]);
+            textHeight.val(thisElement.css('height').split('px')[0]);
+            textAlign.val(thisElement.css('text-align'));
+
+            getContentSuggestions(thisElement);
+        });
+
+        function getContentSuggestions(thisElement) {
+            // Getting content suggestions
+            updateRepr();
+            let selectedIndex = 0;
+            repr['sections'].forEach(function(choice, index) {
+                if (choice['id'] === thisElement.attr('id')) {
+                    selectedIndex = index;
+                }
+            });
+            repr['get_response'] = selectedIndex;
+
+            // Getting options
+            ajaxGetTextOptions(thisElement);
+        }
+
+        textContent.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.text(textContent.val());
+            }
+        });
+        textSize.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('font-size', textSize.val() + 'px');
+            }
+        });
+        textWeight.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('font-weight', textWeight.val());
+            }
+        });
+        textBackground.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('background-color', textBackground.val());
+            }
+        });
+        textColor.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('color', textColor.val());
+            }
+        });
+        textRotation.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('transform', textRotation.val());
+            }
+        });
+        textWidth.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('width', textWidth.val() + 'px');
+            }
+        });
+        textHeight.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('height', textHeight.val() + 'px');
+            }
+        });
+        textAlign.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('text-align', textAlign.val());
+            }
+        });
+
+        $('#content_suggestions').on('click', 'li', function() {
+            textContent.val($(this).text()).trigger('input');
+        });
+
+        // Image form elements
+        let imageContent = $('#image_content');
+        let imageRotation = $('#image_rotation');
+        let imageWidth = $('#image_width');
+        let imageHeight = $('#image_height');
+
+        canvasArea.on('click', '.image-container', function() {
+            // Clicked an image
+            let thisElement = $(this);
+
+            commonStuff(thisElement);
+
+            $('#image_area_form').removeClass('display-none');
+            toggleComposePanel();
+
+            // Fill in the current content
+            imageContent.val(thisElement.attr('src'));
+            imageRotation.val(thisElement.css('transform'));
+            imageWidth.val(thisElement.css('width').split('px')[0]);
+            imageHeight.val(thisElement.css('height').split('px')[0]);
+        });
+
+        imageContent.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.attr('src', imageContent.val());
+            }
+        });
+        imageRotation.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('transform', imageRotation.val());
+            }
+        });
+        imageWidth.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('width', imageWidth.val() + 'px');
+            }
+        });
+        imageHeight.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('height', imageHeight.val() + 'px');
+            }
+        })
+
+
+        function commonStuff(mSelectedContainer) {
+            $('.area-form').addClass('display-none');
+            selectedContainer = mSelectedContainer;
+        }
+
+        function toggleComposePanel() {
+            if (step4.hasClass('active')) {
+                step4.click();
+                step4.click();
+            } else {
+                step4.click();
+            }
+        }
+
+        function updateRepr() {
+            repr['background'] = canvasArea.css('background-image');
+            // Creating the sections
+            let sections = [];
+
+            canvasArea.children().each(function() {
+                // TODO: Order by top position
+                let child = $(this);
+                let content;
+                if (child.attr('src')) {
+                    content = child.attr('src');
+                } else {
+                    content = child.text();
+                }
+                sections.push({
+                    'id': child.attr('id'),
+                    'type': ((child.prop('tagName') === 'IMG') ? 'image' : 'text'),
+                    'styles': child.attr('style'),
+                    'prompt': '',
+                    'selected_content': content,
+                    'title': ''
+                });
+            });
+
+            repr['sections'] = sections;
+        }
+
+        let TEXT_RESPONSE_URL = ''
+
+        function ajaxGetTextOptions(target) {
+            showSpinner();
+            $.ajax({
+                type: 'POST',
+                url: 'https://ai-hackathon-371117.uc.r.appspot.com/generate',
+                data: JSON.stringify(repr),
+                dataType: 'text',
+                contentType: 'application/json; charset=utf-8',
+                success: function(e, response) {
+                    console.log(response);
+                    let mResponse = JSON.parse(response);
+                    if (target === selectedContainer) {
+                        // Show options if we're still on the same target
+                        console.log('Showing options');
+                        showOptions(mResponse['options']);
+                    } else {
+                        console.log('Skipping showing options');
+                    }
+                    hideSpinner();
+                },
+                error: function(response) {
+                    console.log('Error');
+                    console.log(response);
+                    hideSpinner();
+                }
+            });
+        }
+
+        function mjson() {
+            console.log(JSON.stringify(repr));
+        }
+
+        function showOptions() {
+
         }
 
     </script>

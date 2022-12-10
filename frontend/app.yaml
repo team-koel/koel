@@ -1,3 +1,4 @@
+service: composer
 runtime: python310
 
 handlers:
