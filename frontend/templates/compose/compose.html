@@ -7,19 +7,52 @@
             <!-- Step 1: Type -->
             <button class="accordion" id="step1">Step 1: Project type</button>
             <div class="panel" id="a1">
-                Choose between email or poster
+                <div class="switch width-100" id="type">
+                    <button class="no-defaults" id="email">Email</button>
+                    <button class="no-defaults" id="poster">Poster</button>
+                </div>
+                <div class="error-text mt2 display-none text-align-center" id="missing_type">
+                    Please select a project type.
+                </div>
             </div>
 
-            <!-- Step 2: Title, Description -->
-            <button class="accordion" id="step2">Step 2: Basic details</button>
+            <!-- Step 2: Workflows -->
+            <button class="accordion" id="step2">Step 2: Workflow</button>
             <div class="panel">
-                Give a quick description of the project
+                <div class="help-text">
+                    Picking a workflow helps compose more relevant sections, text, and images.
+                </div>
+
+                <div id="workflow_choices" class="flex-choices">
+                </div>
+
+                <div class="error-text mt2 display-none text-align-center" id="missing_workflow">
+                    Please select a workflow before composing.
+                </div>
             </div>
 
-            <!-- Step 3: Templates -->
-            <button class="accordion" id="step3">Step 3: (Optional) Pick a template</button>
+            <!-- Step 3: Basic Details -->
+            <button class="accordion" id="step3">Step 3: Basic project details</button>
             <div class="panel">
-                Choose from amongst some default templates.
+                <div class="panel-content">
+                    <div class="form-input">
+                        <label for="project_title">Title</label>
+                        <input id="project_title" type="text" maxlength="156" />
+                        <div class="error-text display-none" id="missing_title">
+                            A title is needed.
+                        </div>
+                    </div>
+                    <div class="form-input">
+                        <label for="project_description">Description</label>
+                        <textarea id="project_description"></textarea>
+                        <div class="error-text display-none" id="missing_description">
+                            A description (even a short one) is needed.
+                        </div>
+                    </div>
+                    <button class="form-submit mb2" id="compose">
+                        Compose!
+                    </button>
+                </div>
             </div>
 
             <!-- Step 4: Compose -->
@@ -38,6 +71,15 @@
         <div class="tools">
             <div id="tools_area" class="tools-area">
                 <!-- Page setup (size, color, gradients, etc.) -->
+                <div class="heading">
+                    Page
+                </div>
+                <button class="no-defaults" id="tool_background">
+                    <img draggable="false" src="{{ url_for('static', filename='icons/background.svg') }}" width="40px" height="40px" alt="background" />
+                    <span class="description">
+                        Background
+                    </span>
+                </button>
 
                 <!-- Content (draggable) -->
                 <div class="heading">
@@ -67,22 +109,22 @@
 
 {% block head %}
     <style>
+        /* Stuff that can be main.css */
         header {
             border-bottom: 1px solid gray;
             z-index: 2;
         }
 
-
         .accordion {
             font-size: 16px;
             line-height: 20px;
-            padding: 12px;
+            padding: 18px 14px;
             width: 100%;
 
             text-align: left;
 
-            border-bottom: 1px solid #ababab;
-            border-top: none;
+            border-top: 1px solid #ababab;
+            border-bottom: none;
             border-left: none;
             border-right: none;
             outline: none;
@@ -108,12 +150,48 @@
         }
 
         .panel {
-            padding: 0 18px;
             background-color: white;
             overflow: hidden;
             max-height: 0;
             transition: max-height 0.2s ease-out;
+
+            padding: 0;
         }
+
+        .panel > .error-text {
+            font-size: 14px;
+            line-height: 18px;
+            margin-left: 14px;
+        }
+
+        .switch {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .switch > button {
+            font-size: 14px;
+            line-height: 18px;
+            padding: 10px 14px;
+            flex-grow: 1;
+            max-width: 140px;
+
+            border: 1px solid gray;
+        }
+
+        .switch > button:hover {
+            border: 1px solid #71365b;
+            background: #efefef;
+        }
+
+        .switch > button.selected {
+            background: #71365b;
+            color: #efefef
+        }
+
+        /* Composer specific stuff */
 
         .composer {
             width: 100vw;
@@ -138,6 +216,10 @@
             width: 420px;
             height: 100%;
             background-color: #fdfdfd;
+        }
+
+        .playground .panel {
+            width: 100%;
         }
 
         .tools {
@@ -225,6 +307,96 @@
             line-height: 18px;
             color: #232323;
         }
+
+        .panel > .help-text {
+            padding: 0 14px;
+            font-size: 14px;
+            line-height: 18px;
+        }
+
+        .flex-choices {
+            display: flex;
+            align-content: flex-start;
+            flex-direction: row;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .flex-choices > button {
+            font-size: 14px;
+            line-height: 16px;
+            padding: 10px 14px;
+            outline: 1px solid gray;
+        }
+
+        .flex-choices > button:hover {
+            background: #71356b20;
+        }
+
+        .flex-choices > button.selected {
+            background: #71356b;
+            color: white;
+            outline: 1px solid #71356b;
+        }
+
+        .flex-choices {
+            margin: 10px 14px;
+        }
+
+        .panel-content {
+            padding: 0 14px;
+        }
+
+        .form-input {
+            display: flex;
+            flex-direction: column;
+            align-content: start;
+            align-items: start;
+
+            margin-bottom: 16px;
+        }
+
+        .form-input > input:focus, .form-input > textarea:focus {
+            border: 1px solid #71356b;
+            outline: none;
+        }
+
+        .form-input > label {
+            font-size: 14px;
+            line-height: 18px;
+        }
+
+        .form-input > input, .form-input > textarea {
+            border: 1px solid #71356b80;
+            width: 280px;
+            font-size: 14px;
+            line-height: 18px;
+        }
+
+        .form-input > textarea {
+            height: 86px;
+        }
+
+        .form-input > .error-text {
+            font-size: 14px;
+            line-height: 18px;
+        }
+
+        .form-submit {
+            background: #71356b;
+            color: #fefefe;
+
+            font-size: 14px;
+            line-height: 18px;
+
+            padding: 10px 14px;
+
+            border: none;
+        }
+
+        .form-submit:hover {
+            background: #5b6f6e;
+        }
     </style>
 {% endblock head %}
 
@@ -238,32 +410,225 @@
         let editDoc = $('#edit_doc');
         let toolsArea = $('#tools_area');
         editDoc.on('click', function() {
-            console.log('clicked');
             if (editDoc.hasClass('selected')) {
                 editDoc.removeClass('selected');
                 toolsArea.removeClass('open');
             } else {
-                console.log('expanding');
                 editDoc.addClass('selected');
                 toolsArea.addClass('open');
             }
         });
 
+        let repr = {
+            'id': 'abc123',
+        }
+
         /* Accordion */
+        let step1 = $('#step1');
+        let step2 = $('#step2');
+        let step3 = $('#step3');
+        let step4 = $('#step4');
+
+
         $('.accordion').on('click', function() {
             $(this).toggleClass('active');
             let panel = this.nextElementSibling;
             if (panel.style.maxHeight) {
-                console.log(panel.style.maxHeight + ' max height');
                 panel.style.maxHeight = null;
+                panel.style.padding = 0;
             } else {
-                console.log(panel.scrollHeight);
                 panel.style.maxHeight = panel.scrollHeight + 'px';
+                panel.style.padding = '20px 0';
             }
         });
+
+        /* On page load */
 
         $(function() {
             step1.click();
         });
+
+        /* Type */
+        let TYPE_EMAIL = 'email';
+        let TYPE_POSTER = 'poster';
+        let missingType = $('#missing_type');
+
+
+        $('.switch#type > button').on('click', function() {
+            $(this).addClass('selected').siblings().removeClass('selected');
+            changeType(this.id);
+        })
+
+        function changeType(type) {
+            // We just added a new type, go to the next section
+            let showNextSection = !('type' in repr);
+            repr['type'] = type;
+
+            setupWorkflowChoices(type);
+
+            if (showNextSection) {
+                if (!step2.hasClass('active')) {
+                    step2.click();
+                }
+            }
+        }
+
+        /* Compose defs - logic comes later */
+        let compose = $('#compose');
+        let projectTitle = $('#project_title');
+        let projectDescription = $('#project_description');
+        let missingTitle = $('#missing_title');
+        let missingDescription = $('#missing_description');
+
+        /* Workflow */
+        let EMAIL_WORKFLOWS = [
+            'Event',
+            'Contest',
+            'Sales (cold emails)',
+            'Product/Feature',
+            'Sale',
+            'Wedding Invite'
+        ];
+        let POSTER_WORKFLOWS = [
+            'Event',
+            'Business',
+            'Product',
+            'Contest',
+            'Menu',
+            'Wedding'
+        ];
+
+        let EMAIL_EXAMPLES = [
+            'An in-person conference on Dermatology for healthcare providers over 2 days. Early bird discounts on tickets.',
+            'An ai powered virtual hackathon, open to anyone in the world, large cash prizes. The theme is AI powered.',
+            'Koel can empower your sales and marketing team with AI powered emails and posters.',
+            'Introducing Koel talk, a voice powered assistant for the Amazon android application. With it you can listen to music, watch tv, and shop while on the move completely handsfree.',
+            'Limited time online black friday sale featuring 2 products with huge discounts.',
+            'A destination wedding invitation for Viraj & Parav.',
+        ]
+        let POSTER_EXAMPLES = [
+            'An in-person conference on Dermatology for healthcare providers over 2 days. Early bird discounts on tickets.',
+            'Grand opening of a local sandwich restaurant. Early birds eat for free.',
+            'Koel, the ultimate assistant for composing emails, and posters. Get started for free.',
+            'An ai powered virtual hackathon, open to anyone in the world, large cash prizes. The theme is AI powered.',
+            'Menu for a fast food restaurant including a section for a kids menu.',
+            'A destination wedding announcement for Viraj & Parav.',
+        ]
+
+        let workflowChoices = $('#workflow_choices');
+        let currentWorkflowType = null;
+
+        let missingWorkflow = $('#missing_workflow');
+
+        function setupWorkflowChoices(type) {
+            if (currentWorkflowType === type) {
+                // Do nothing, the type is the same
+                return;
+            }
+            currentWorkflowType = type;
+
+            let choiceOptions;
+            if (type === TYPE_EMAIL) {
+                choiceOptions = EMAIL_WORKFLOWS;
+            } else {
+                choiceOptions = POSTER_WORKFLOWS;
+            }
+
+            // Setting the choices
+
+            workflowChoices.empty();
+
+            choiceOptions.forEach(function (choice, index) {
+                workflowChoices.append($('<button>', {
+                    id: 'workflow_' + index,
+                    'class': 'no-defaults',
+                    'text': choice
+                }));
+            });
+        }
+
+        workflowChoices.on('click', 'button', function() {
+            $(this).addClass('selected').siblings().removeClass('selected');
+
+            let workflowIndex = '' + this.id.split('_').pop();
+            changeWorkflow(parseInt(workflowIndex));
+        });
+
+        function changeWorkflow(workflowIndex) {
+            // We just added a new workflow, auto open the next section
+            let showNextSection = !('workflow' in repr);
+            let hints;
+            if (repr['type'] === TYPE_EMAIL) {
+                repr['workflow'] = EMAIL_WORKFLOWS[workflowIndex];
+                hints = EMAIL_EXAMPLES;
+            } else {
+                repr['workflow'] = POSTER_WORKFLOWS[workflowIndex];
+                hints = POSTER_EXAMPLES;
+            }
+
+            // Updating step 3's hint text
+            let hint;
+            if (0 < workflowIndex <= hints.length) {
+                hint = hints[workflowIndex];
+            } else {
+                hint = hints[0];
+            }
+            projectDescription.attr('placeholder', hint);
+
+            if (showNextSection) {
+                if (!step3.hasClass('active')) {
+                    step3.click();
+                }
+            }
+        }
+
+        /* Compose */
+
+        compose.on('click', function() {
+            let mTitle = projectTitle.val();
+            let mDescription = projectDescription.val();
+
+            missingTitle.addClass('display-none');
+            missingDescription.addClass('display-none');
+            missingType.addClass('display-none');
+            missingWorkflow.addClass('display-none');
+
+            if (!('type' in repr)) {
+                missingType.removeClass('display-none');
+                // Bring attention to the class with the issue
+                if (!step1.hasClass('active')) {
+                    step1.click();
+                } else {
+                    step1.click();
+                    step1.click();
+                }
+                return;
+            }
+
+            if (!('workflow' in repr)) {
+                missingWorkflow.removeClass('display-none');
+                if (!step2.hasClass('active')) {
+                    step2.click();
+                } else {
+                    step2.click();
+                    step2.click();
+                }
+                return;
+            }
+
+            if (!mTitle) {
+                missingTitle.removeClass('display-none');
+                return;
+            }
+            if (!mDescription) {
+                missingDescription.removeClass('display-none');
+                return;
+            }
+
+            repr['title'] = mTitle;
+            repr['description'] = mDescription;
+
+        });
+
     </script>
 {% endblock foot %}
