@@ -5,6 +5,7 @@ from flask_cors import CORS, cross_origin
 
 import openai
 import os
+import json
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -101,6 +102,129 @@ def root():
 #         return "No template name provided", 400
 #     template = 
 
+class yaml_like:
+    def __init__(self, data):
+        self.data = data
+        self.current_state = "section"
+        self.content_dict = {}
+        self.sections = []
+    
+    def _read(self):
+        for line in self.data.splitlines():
+                yield line
+
+    def parse(self):
+        lines = self._read()
+        for line in lines:
+            if line.startswith("[section]"):
+                if self.current_state == "section":
+                    # end of previous section
+                    print(self.content_dict)
+                    self.sections.append(self.content_dict)
+                    self.content_dict = {}
+                    continue
+            elif "- type:" in line:
+                #self.content_dict["type"] = line.split(":")[1].strip()
+                continue
+            elif "- content:" in line:
+                self.content_dict["content"] = line.split("- content:")[1].strip().replace('"', '')
+            elif line.strip() == "":
+                # something weird
+                raise ValueError(f"Something weird happened: {line}")
+        self.sections.append(self.content_dict)
+        return self.sections
+                
+
+@app.route('/generate-template', methods=['POST'])
+@cross_origin()
+def generate_template():
+    print(request.get_data())
+    try:
+        data = request.get_json()
+    except Exception as e:
+        print(e)
+        return "Invalid JSON", 400
+    workflow = data['workflow']
+    title = data['title']
+    description = data['description']
+    document_type = data['type']
+
+    first_section_prompt = data['sections'][0]['prompt']
+
+    PROMPT = \
+f"""
+# example configuration describing an email/poster with different sections
+# the configuration file should end after the last section
+# currently, the only supported section type Text
+
+# example configuration describing an email/poster with different sections
+# the configuration file should end after the last section
+
+[poster]
+    - Workflow: Wedding Invite
+    - Title: Kate and Adam's Wedding
+    - Description: A poster for Kate and Adam's wedding indicating the name of the couple, date, time, venue, RSVP email, gifting to charity
+    - num_sections: 10
+    - supported_section_types: ["Text"]
+[section]
+    - type: "Text"
+    - content: "Together with their families"
+[section]
+    - type: "Text"
+    - content: "Kate and Adam"
+[section]
+    - type: "Text"
+    - content: "Invite you to their wedding on"
+[section]
+    - type: "Text"
+    - content: "Saturday, the twenty-fifth of July"
+[section]
+    - type: "Text"
+    - content: "Two Thousand and Twenty"
+[section]
+    - type: "Text"
+    - content: "At six o'clock in the evening"
+[section]
+    - type: "Text"
+    - content: "The Grand Hotel, New York"
+[section]
+    - type: "Text"
+    - content: "RSVP to kate@gmail.com or 404-524-1234"
+[section]
+    - type: "Text"
+    - content: "In lieu of gifts, please consider donating to the charity of your choice."
+
+[{document_type}]
+    - Workflow: {workflow}
+    - Title: {title}
+    - Description: {description}
+    - num_sections: 10
+    - supported_section_types: ["Text"]
+[section]
+"""
+    response = openai.Completion.create(
+                model="text-davinci-003",
+                prompt=PROMPT,
+                temperature=0.7,
+                max_tokens=839,
+                top_p=1,
+                frequency_penalty=0.17,
+                presence_penalty=0,
+                stop=["\n\n"]
+    )
+
+    response_text = response['choices'][0]['text']
+    print(PROMPT + response_text)
+    # parse the response
+    sections = []
+    try:
+        parser = yaml_like(response_text)
+        sections = parser.parse()
+        print({"sections": sections})
+        return {"sections": sections}, 200
+    except Exception as e:
+        print(e)
+        return "Error parsing response", 400
 
 
 @app.route('/generate', methods=['POST'])
@@ -135,7 +259,7 @@ f"""
         if idx == prompted_section:
             section_content = "[insert]"
         else:
-            section_content = section['prompt']
+            section_content = section['selected_content']
         sections.append(PROMPT_SECTION % {'type': section_type, 'content': section_content})
     
     PROMPT_FOOTER = "Suggest 10 alternative content options for replacing the [insert] tag. The options should be separated by a newline. Do not include the [insert] tag in the options."
@@ -156,6 +280,8 @@ f"""
     response_options = [option.strip() for option in response_options if option.strip()]
 
     return {'options': response_options}, 200
+
+
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
