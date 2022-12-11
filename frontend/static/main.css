@@ -21,8 +21,13 @@ body {
     font-weight: 400;
     line-height: 22px;
     letter-spacing: 0.5px;
-    color: #30002b;
-    background: #f6f2ff;
+    color: #ffffff;
+    background: #040057;
+}
+
+.bg-white {
+    background: #ffffff;
+    color: #040057;
 }
 
 .color-secondary {
@@ -80,11 +85,11 @@ h4 {
 }
 
 header {
-    background: #ffffff;
     width: auto;
     padding: 10px 15px;
     line-height: 1;
 
+    height: 56px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;

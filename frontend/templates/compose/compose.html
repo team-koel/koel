@@ -256,41 +256,16 @@
         </div>
 
         <!-- Tools -->
-        <div class="tools m-scrollbar">
-            <div id="tools_area" class="tools-area">
-                <!-- Page setup (size, color, gradients, etc.) -->
-                <div class="heading">
-                    Page
-                </div>
-                <button class="no-defaults" id="tool_background">
-                    <img draggable="false" src="{{ url_for('static', filename='icons/background.svg') }}" width="40px" height="40px" alt="background" />
-                    <span class="description">
-                        Background
-                    </span>
-                </button>
-
-                <!-- Content (draggable) -->
-                <div class="heading">
-                    Content
-                </div>
-                <button draggable="true" class="no-defaults drag-tool" id="tool_text">
-                    <img draggable="false" src="{{ url_for('static', filename='icons/text.svg') }}" width="40px" height="40px" alt="text" />
-                    <span class="description">
-                        Text
-                    </span>
-                </button>
-                <button draggable="true" class="no-defaults drag-tool" id="tool_image">
-                    <img draggable="false" src="{{ url_for('static', filename='icons/image.svg') }}" width="40px" height="40px" alt="image" />
-                    <span class="description">
-                        Image
-                    </span>
-                </button>
-            </div>
-            <div class="tools-menu">
-                <button id="edit_doc" class="no-defaults">
-                    <img src="{{ url_for('static', filename='icons/edit_document.svg') }}" width="24px" height="24px" alt="edit document" />
-                </button>
-            </div>
+        <div class="tools display-none" id="tools">
+            <button draggable="true" class="no-defaults drag-tool" id="tool_text">
+                <img draggable="false" src="{{ url_for('static', filename='icons/text.svg') }}" alt="text" width="30px" height="30px" />
+            </button>
+            <button draggable="true" class="no-defaults drag-tool" id="tool_image">
+                <img draggable="false" src="{{ url_for('static', filename='icons/image.svg') }}" alt="text" width="30px" height="30px" />
+            </button>
+            <button class="no-defaults" id="tool_background">
+                <img draggable="false" src="{{ url_for('static', filename='icons/background.svg') }}" alt="background" width="30px" height="30px" />
+            </button>
         </div>
     </div>
 {% endblock content %}
@@ -314,7 +289,7 @@
     <style>
         /* Stuff that can be main.css */
         header {
-            border-bottom: 1px solid gray;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
             z-index: 2;
         }
 
@@ -335,47 +310,48 @@
         }
 
         .switch > button:hover {
-            border: 1px solid #71365b;
+            border: 1px solid #040057;
             background: #efefef;
         }
 
         .switch > button.selected {
-            background: #71365b;
+            background: #040057;
             color: #efefef;
         }
 
         /* Steps */
         .step-button {
-            font-size: 16px;
-            line-height: 20px;
+            font-size: 32px;
+            line-height: 44px;
             border: none;
-            border-bottom: 1px solid #efefef;
-            border-left: 4px solid transparent;
+            border-bottom: 1px solid #ffffff50;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
             display: block;
             width: 100%;
-            height: 70px;
+            height: 90px;
 
             background: none;
             text-decoration: none;
             margin: 0;
 
-            color: #30002b;
+            color: #ffffff;
 
             font-weight: 700;
             letter-spacing: 2px;
         }
 
         .step-button:hover {
-            border-left: 4px solid #71356b;
+            border-left: 8px solid #ffffff;
         }
 
         .step-button.selected {
-            border-left: 4px solid #71356b;
+            border-left: 8px solid #ffffff;
         }
 
         .step-button.disabled {
             cursor: not-allowed;
-            color: #30002b;
+            color: #ffffff70;
         }
 
         .step-button.disabled:hover {
@@ -386,7 +362,7 @@
 
         .composer {
             width: 100vw;
-            height: calc(100vh - 49px);
+            height: calc(100vh - 77px);
             background: #dcdcdc;
 
             display: flex;
@@ -400,6 +376,7 @@
             right: 100px;
             top: 100px;
             background: #ffffff;
+            color: #040057;
             width: 400px;
             max-height: 800px;
             padding: 20px 14px;
@@ -432,9 +409,10 @@
         }
 
         .playground {
-            width: 80px;
+            width: 110px;
             height: 100%;
-            background-color: #fdfdfd;
+            border-right: 1px solid #ffffff50;
+            background: #040057;
             overflow: hidden;
         }
 
@@ -443,89 +421,28 @@
         }
 
         .tools {
-            min-width: 57px;
-            height: 100%;
+            position: absolute;
+            width: 74px;
+            height: 220px;
+            right: 50px;
+            top: 200px;
+            background: #040057;
+            border-radius: 33px;
+
             display: flex;
-        }
-
-        .tools-area {
-            width: 0;
-
-            transition: width 0.5s ease;
-
-            background-color: #fdfdfd;
-        }
-
-        .tools-area.open {
-            width: 223px;
-        }
-
-        .tools-menu {
-            width: 57px;
-            background: #fafafa;
-            height: 100%;
-            border-left: 1px solid rgba(0, 0, 0, 0.2);
-        }
-
-        .tools-menu > button {
-            width: 57px;
-            height: 57px;
-            border-bottom: 2px solid #fafafa;
-        }
-
-        .tools-menu > button:hover {
-            border-bottom: 2px solid #71356b;
-            background: #efefef;
-        }
-
-        .tools-menu > button.selected {
-            border-bottom: 2px solid #71356b;
-            background: #71356b80;
-        }
-
-        .tools-menu > button > img {
-            margin: auto;
-        }
-
-        .tools-area > button {
-            width: 80px;
-            height: 80px;
-            margin: 30px auto;
-
-            border: 1px solid gray;
-            border-radius: 3px;
-
-            display: none;
             flex-direction: column;
-
-            justify-content: center;
             align-items: center;
-
-            gap: 8px;
+            justify-content: center;
+            gap: 34px;
         }
 
-        .tools-area.open > button {
-            display: flex;
+        .tools > button {
+            width: 30px;
+            height: 30px;
         }
 
-        .tools-area > button:hover {
-            box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.2);
-        }
-
-        .tools-area > .heading {
-            font-size: 16px;
-            padding: 20px;
-            display: none;
-        }
-
-        .tools-area.open > .heading {
-            display: block;
-        }
-
-        .tools-area .description {
-            font-size: 14px;
-            line-height: 18px;
-            color: #232323;
+        .tools > button.drag-tool {
+            cursor: move !important;
         }
 
         .help-text {
@@ -574,11 +491,11 @@
         }
 
         .template-options > button:hover {
-            border: 3px solid #71356b;
+            border: 3px solid #040057;
         }
 
         .template-options > button.selected {
-            border: 3px solid #71356b;
+            border: 3px solid #040057;
         }
 
         .card-heading {
@@ -611,9 +528,9 @@
         }
 
         .flex-choices > button.selected {
-            background: #71356b;
+            background: #040057;
             color: white;
-            outline: 1px solid #71356b;
+            outline: 1px solid #040057;
         }
 
         .form-input {
@@ -626,7 +543,7 @@
         }
 
         .form-input > input:focus, .form-input > textarea:focus {
-            border: 1px solid #71356b;
+            border: 1px solid #040057;
             outline: none;
         }
 
@@ -636,7 +553,7 @@
         }
 
         .form-input > input, .form-input > textarea {
-            border: 1px solid #71356b80;
+            border: 1px solid #04005780;
             width: 280px;
             font-size: 14px;
             line-height: 18px;
@@ -656,7 +573,7 @@
         }
 
         .form-submit {
-            background: #71356b;
+            background: #040057;
             color: #fefefe;
 
             font-size: 14px;
@@ -688,6 +605,8 @@
             flex-direction: row;
             justify-content: center;
             align-items: center;
+
+            color: #040057;
         }
 
         .step-1 {
@@ -711,7 +630,7 @@
         }
 
         .step-1 > button:hover {
-            border: 4px solid #7e4d8f;
+            border: 4px solid #040057;
         }
 
         .step-1 > button.disabled:hover {
@@ -719,7 +638,7 @@
         }
 
         .step-1 > button.selected {
-            border: 4px solid #7e4d8f;
+            border: 4px solid #040057;
         }
 
         .canvas-area {
@@ -773,7 +692,7 @@
             padding: 14px 18px;
             font-size: 14px;
             line-height: 18px;
-            background-color: #71356b;
+            background-color: #040057;
             color: #efefef;
             margin-bottom: 6px;
             cursor: pointer;
@@ -799,19 +718,6 @@
         let POSTER_WIDTH = 570;
         let POSTER_HEIGHT = 880;
         let EMAIL_WIDTH = 570;
-
-        /* Tools panel */
-        let editDoc = $('#edit_doc');
-        let toolsArea = $('#tools_area');
-        editDoc.on('click', function() {
-            if (editDoc.hasClass('selected')) {
-                editDoc.removeClass('selected');
-                toolsArea.removeClass('open');
-            } else {
-                editDoc.addClass('selected');
-                toolsArea.addClass('open');
-            }
-        });
 
         let repr = {
             'id': 'abc123',
@@ -1070,9 +976,7 @@
         });
 
         function beginCompose() {
-            if (!editDoc.hasClass('selected')) {
-                editDoc.click();
-            }
+            $('#tools').removeClass('display-none');
 
             doInitialCompose();
         }

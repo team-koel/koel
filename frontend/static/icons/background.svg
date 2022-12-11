@@ -1,1 +1,10 @@
-<?xml version="1.0" ?><svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><title/><g data-name="normal size, full screen, full, resize, fit to page, select, fit" id="normal_size_full_screen_full_resize_fit_to_page_select_fit"><path d="M29,2H3A1,1,0,0,0,2,3V29a1,1,0,0,0,1,1H29a1,1,0,0,0,1-1V3A1,1,0,0,0,29,2ZM28,28H4V4H28Z"/><path d="M20,8h4v4a1,1,0,0,0,2,0V7a1,1,0,0,0-1-1H20a1,1,0,0,0,0,2Z"/><path d="M7,26h5a1,1,0,0,0,0-2H8V20a1,1,0,0,0-2,0v5A1,1,0,0,0,7,26Z"/><path d="M7,13a1,1,0,0,0,1-1V8h4a1,1,0,0,0,0-2H7A1,1,0,0,0,6,7v5A1,1,0,0,0,7,13Z"/><path d="M20,26h5a1,1,0,0,0,1-1V20a1,1,0,0,0-2,0v4H20a1,1,0,0,0,0,2Z"/></g></svg>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="0.5" y="0.5" width="23" height="23" stroke="white"/>
+<path d="M3 9V3H9" stroke="white"/>
+<path d="M21 9V3H15" stroke="white"/>
+<path d="M3 15V21H9" stroke="white"/>
+<path d="M21 15V21H15" stroke="white"/>
+<line x1="6.64645" y1="10.6464" x2="10.6464" y2="6.64645" stroke="white"/>
+<line x1="12.6464" y1="16.6464" x2="16.6464" y2="12.6464" stroke="white"/>
+<line x1="5.64645" y1="17.6464" x2="17.6464" y2="5.64645" stroke="white"/>
+</svg>
