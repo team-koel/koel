@@ -84,6 +84,11 @@ header {
     width: auto;
     padding: 10px 15px;
     line-height: 1;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-content: center;
 }
 
 .container {
@@ -146,7 +151,7 @@ header {
 }
 
 .display-none {
-    display: none;
+    display: none !important;
 }
 
 button {
@@ -154,6 +159,20 @@ button {
     font-size: 18px;
     line-height: 28px;
     cursor: pointer;
+}
+
+button.secondary {
+    padding: 8px 12px;
+    color: #efefef;
+    background: #5b6f6e;
+    border: none;
+    outline: none;
+}
+
+button.secondary:hover {
+    padding: 20px 14px;
+    color: #efefef;
+    background: #5b6f6e80;
 }
 
 .toggle-buttons > button {

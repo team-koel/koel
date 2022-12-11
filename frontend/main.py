@@ -17,7 +17,7 @@ def home():
 @app.route('/compose/')
 def compose():
     context = {
-        'page_name': 'Compose',
+        'page_name': 'Mozart',
     }
     return render_template('compose/compose.html', **context)
 

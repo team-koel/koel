@@ -15,7 +15,7 @@
 
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='main.css') }}?v=202212100206" />
 
-    <title>{{ page_name|default('Koel') }}</title>
+    <title>{{ page_name|default('Mozart') }}</title>
 
     <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='icons/favicon.png') }}" />
 
@@ -27,8 +27,11 @@
     <header>
         <a class="image-link site-logo" href="{{ url_for('home') }}">
             <img src="{{ url_for('static', filename='icons/logo.svg') }}" width="28px" height="28px" alt="logo" />
-            <span class="ml1">Koel <sup>ai</sup></span>
+            <span class="ml1">Mozart</span>
         </a>
+        <div>
+            <img id="compose_spinner" src="{{ url_for('static', filename='icons/spinner.gif') }}" class="display-none" alt="working" height="22px" />
+        </div>
     </header>
 
     {% block content %}
