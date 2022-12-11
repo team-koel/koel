@@ -1,4 +1,4 @@
-service: composer
+service: mozart
 runtime: python310
 
 handlers:

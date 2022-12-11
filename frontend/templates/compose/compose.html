@@ -2,6 +2,8 @@
 
 {% block content %}
     <div class="composer">
+        <img id="compose_spinner" src="{{ url_for('static', filename='icons/spinner.gif') }}" class="display-none" alt="working" height="22px" />
+
         <div class="edit-panel display-none" id="edit_panel">
             <div class="heading">
                 <span>Edit</span>
@@ -645,6 +647,7 @@
             width: 0;
             height: 0;
             margin: 40px auto;
+            color: #000000;
             background-image: linear-gradient(#ffdda4, #ffbe72);
             background-position: center;
             background-repeat: no-repeat;
@@ -700,6 +703,12 @@
 
         .image-container {
             object-fit: contain;
+        }
+
+        #compose_spinner {
+            top: 20px;
+            right: 20px;
+            position: absolute;
         }
     </style>
 {% endblock head %}
