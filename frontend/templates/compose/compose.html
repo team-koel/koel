@@ -1,0 +1,1467 @@
+{% extends 'master/master.html' %}
+
+{% block content %}
+    <div class="composer">
+        <img id="compose_spinner" src="{{ url_for('static', filename='icons/spinner.gif') }}" class="display-none" alt="working" height="22px" />
+
+        <div class="edit-panel display-none" id="edit_panel">
+            <div class="heading">
+                <span>Edit</span>
+                <button class="no-defaults" id="close_edit_panel">
+                    <img src="{{ url_for('static', filename='icons/close_icon.svg') }}" height="16px" alt="close panel" />
+                </button>
+            </div>
+            <div class="display-none area-form" id="text_area_form">
+                <div class="form-input">
+                    <label for="text_content">
+                        Content
+                    </label>
+                    <textarea id="text_content"></textarea>
+                </div>
+                <ul class="content-suggestions display-none" id="content_suggestions">
+                    <li>Suggest 1</li>
+                    <li>Suggest 2</li>
+                    <li>Suggest 3</li>
+                    <li>Suggest 4</li>
+                </ul>
+                <div class="form-row">
+                    <div class="form-input">
+                        <label for="text_font">
+                            Font
+                        </label>
+                        <select id="text_font">
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-input">
+                        <label for="text_size">
+                            Font size (px)
+                        </label>
+                        <input id="text_size" type="number" min="0" />
+                    </div>
+                    <div class="form-input">
+                        <label for="text_weight">
+                            Font weight
+                        </label>
+                        <input id="text_weight" type="number" min="0" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-input">
+                        <label for="text_background">
+                            Background color
+                        </label>
+                        <input id="text_background" type="text" maxlength="20" class="short" />
+                    </div>
+
+                    <div class="form-input">
+                        <label for="text_color">
+                            Text color
+                        </label>
+                        <input id="text_color" type="text" maxlength="20" class="short" />
+                    </div>
+                </div>
+                <div class="form-input">
+                    <label for="text_rotation">
+                        Transform (rotation)
+                    </label>
+                    <input id="text_rotation" type="text" maxlength="100" />
+                </div>
+                <div class="form-row">
+                    <div class="form-input">
+                        <label for="text_width">
+                            Width (px)
+                        </label>
+                        <input id="text_width" type="number" />
+                    </div>
+                    <div class="form-input">
+                        <label for="text_height">
+                            Height (px)
+                        </label>
+                        <input id="text_height" type="number" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-input">
+                        <label for="text_align">
+                            Text align (left, center, right)
+                        </label>
+                        <select id="text_align">
+                            <option value="left">Left</option>
+                            <option value="center">Center</option>
+                            <option value="right">Right</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="secondary delete">
+                    Delete Element
+                </button>
+            </div>
+
+            <div class="display-none area-form" id="image_area_form">
+                <div class="form-input">
+                    <label for="image_content">
+                        Image source
+                    </label>
+                    <input id="image_content" type="text" maxlength="512" />
+                </div>
+                <div class="form-input">
+                    <label for="image_rotation">
+                        Transform (rotation)
+                    </label>
+                    <input id="image_rotation" type="text" maxlength="100" />
+                </div>
+                <div class="form-row">
+                    <div class="form-input">
+                        <label for="image_width">
+                            Width (px)
+                        </label>
+                        <input id="image_width" type="number" />
+                    </div>
+                    <div class="form-input">
+                        <label for="image_height">
+                            Height (px)
+                        </label>
+                        <input id="image_height" type="number" />
+                    </div>
+                </div>
+
+                <button class="secondary delete">
+                    Delete Element
+                </button>
+            </div>
+
+            <div class="display-none area-form" id="background_form">
+                <div class="help-text"><strong>Using an image</strong></div>
+                <div class="form-input">
+                    <label for="bg_src">
+                        Image source
+                    </label>
+                    <input id="bg_src" type="text" maxlength="512" />
+                </div>
+
+                <div class="help-text mt1"><strong>Using a color gradient</strong></div>
+                <div class="form-row">
+                    <div class="form-input">
+                        <label for="bg_gradient_start">
+                            Start color
+                        </label>
+                        <input id="bg_gradient_start" type="text" maxlength="20" class="short" />
+                    </div>
+                    <div class="form-input">
+                        <label for="bg_gradient_end">
+                            End color
+                        </label>
+                        <input id="bg_gradient_end" type="text" maxlength="20" class="short" />
+                    </div>
+                </div>
+                <div class="form-input">
+                    <label for="bg_gradient_direction">
+                        Direction
+                    </label>
+                    <input id="bg_gradient_direction" type="text" maxlength="30" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Playground -->
+        <div class="playground m-scrollbar">
+            <button class="step-button" id="step1">
+                1
+            </button>
+            <button class="step-button" id="step2">
+                2
+            </button>
+            <button class="step-button" id="step3">
+                3
+            </button>
+            <button class="step-button" id="step4">
+                4
+            </button>
+        </div>
+
+        <!-- Canvas -->
+        <div class="canvas m-scrollbar">
+            <!-- Step 1 content -->
+            <div class="step-content step-1">
+                <button class="no-defaults type-button" id="poster">
+                    <img src="{{ url_for('static', filename='composer/icons/poster_type.svg') }}" alt="poster" width="130px" height="130px" />
+                    <span class="description">Poster</span>
+                </button>
+
+                <button class="no-defaults type-button" id="email">
+                    <img src="{{ url_for('static', filename='composer/icons/email_type.svg') }}" alt="poster" width="130px" height="130px" />
+                    <span class="description">Email</span>
+                </button>
+
+                <button class="no-defaults type-button disabled" id="ppt_type">
+                    <img src="{{ url_for('static', filename='composer/icons/image_placeholder.svg') }}" alt="poster" width="130px" height="130px" />
+                    <span class="description">Presentation</span>
+                </button>
+            </div>
+
+            <div class="step-content step-2 display-none">
+                <div class="bg-white card">
+                    <div class="card-heading">Details</div>
+                    <div class="help-text text-align-center">
+                        Filling in these details allows us to take care of creating all the content for you. This information can
+                        be changed later.
+                    </div>
+                    <div class="form-input mt2">
+                        <label>Type*</label>
+                        <div id="workflow_choices" class="flex-choices">
+                        </div>
+                        <div class="error-text display-none" id="missing_workflow">
+                            Please select an option above.
+                        </div>
+                    </div>
+
+                    <div class="form-input">
+                        <label for="project_title">Title*</label>
+                        <input id="project_title" type="text" maxlength="156" />
+                        <div class="error-text display-none" id="missing_title">
+                            A title is needed.
+                        </div>
+                    </div>
+                    <div class="form-input">
+                        <label for="project_description">Description*</label>
+                        <textarea id="project_description"></textarea>
+                        <div class="error-text display-none" id="missing_description">
+                            A description (even a short one) is needed.
+                        </div>
+                    </div>
+
+                    <button class="form-submit mb2" id="compose">
+                        Continue
+                    </button>
+                </div>
+            </div>
+
+            <div class="step-content step-3 display-none">
+                <div class="bg-white card">
+                    <div class="card-heading">Templates</div>
+                    <div class="help-text text-align-center">
+                        Pick a template based on the design, do not worry about the content.
+                    </div>
+                    <div class="template-options" id="template_options">
+                        <button class="no-defaults" id="template_1">
+                            <img src="{{ url_for('static', filename='icons/default_template.svg') }}" alt="template option" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="canvas_area" class="canvas-area">
+            </div>
+        </div>
+
+        <!-- Tools -->
+        <div class="tools display-none" id="tools">
+            <button draggable="true" class="no-defaults drag-tool" id="tool_text">
+                <img draggable="false" src="{{ url_for('static', filename='icons/text.svg') }}" alt="text" width="30px" height="30px" />
+            </button>
+            <button draggable="true" class="no-defaults drag-tool" id="tool_image">
+                <img draggable="false" src="{{ url_for('static', filename='icons/image.svg') }}" alt="text" width="30px" height="30px" />
+            </button>
+            <button class="no-defaults" id="tool_background">
+                <img draggable="false" src="{{ url_for('static', filename='icons/background.svg') }}" alt="background" width="30px" height="30px" />
+            </button>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block head %}
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+    <script>
+        const FONT_FAMILIES = [
+            'Montserrat', 'Oswald', 'Raleway', 'Open Sans', 'Sniglet', 'Cabin', 'Abril Fatface', 'Lato',
+            'Merriweather', 'Special Elite', 'Six Caps', 'Josefin Slab', 'Mrs. Sheppard', 'Montserrat',
+            'Homemade Apple', 'Playfair Display', 'Permanent Marker', 'Roboto'
+        ];
+
+        WebFont.load({
+            google: {
+                families: FONT_FAMILIES
+            }
+        });
+    </script>
+
+    <style>
+        /* Stuff that can be main.css */
+        header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            z-index: 2;
+        }
+
+        .panel > .error-text {
+            font-size: 14px;
+            line-height: 18px;
+            margin-left: 14px;
+        }
+
+        .switch > button {
+            font-size: 14px;
+            line-height: 18px;
+            padding: 10px 14px;
+            flex-grow: 1;
+            max-width: 140px;
+
+            border: 1px solid gray;
+        }
+
+        .switch > button:hover {
+            border: 1px solid #040057;
+            background: #efefef;
+        }
+
+        .switch > button.selected {
+            background: #040057;
+            color: #efefef;
+        }
+
+        /* Steps */
+        .step-button {
+            font-size: 32px;
+            line-height: 44px;
+            border: none;
+            border-bottom: 1px solid #ffffff50;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            display: block;
+            width: 100%;
+            height: 90px;
+
+            background: none;
+            text-decoration: none;
+            margin: 0;
+
+            color: #ffffff;
+
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .step-button:hover {
+            border-left: 8px solid #ffffff;
+        }
+
+        .step-button.selected {
+            border-left: 8px solid #ffffff;
+        }
+
+        .step-button.disabled {
+            cursor: not-allowed;
+            color: #ffffff70;
+        }
+
+        .step-button.disabled:hover {
+            border-left: 4px solid transparent;
+        }
+
+        /* Composer specific stuff */
+
+        .composer {
+            width: 100vw;
+            height: calc(100vh - 77px);
+            background: #dcdcdc;
+
+            display: flex;
+            flex-direction: row;
+
+            position: relative;
+        }
+
+        .edit-panel {
+            position: absolute;
+            right: 100px;
+            top: 100px;
+            background: #ffffff;
+            color: #040057;
+            width: 400px;
+            max-height: 800px;
+            padding: 20px 14px;
+
+            overflow-y: auto;
+
+            z-index: 20;
+
+            box-shadow: rgba(149, 157, 165, 0.2) 0 8px 24px;
+        }
+
+        .edit-panel > .heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 20px 0;
+            border-bottom: 1px solid gray;
+
+            margin-bottom: 10px;
+        }
+
+        .canvas {
+            flex-grow: 1;
+            height: 100%;
+            background-image: linear-gradient(140deg, #D4FAFF 9.69%, #FED7FB 86%);
+
+            overflow-y: auto;
+            overflow-x: auto;
+        }
+
+        .playground {
+            width: 110px;
+            height: 100%;
+            border-right: 1px solid #ffffff50;
+            background: #040057;
+            overflow: hidden;
+        }
+
+        .playground .panel {
+            width: 100%;
+        }
+
+        .tools {
+            position: absolute;
+            width: 74px;
+            height: 220px;
+            right: 50px;
+            top: 200px;
+            background: #040057;
+            border-radius: 33px;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 34px;
+        }
+
+        .tools > button {
+            width: 30px;
+            height: 30px;
+        }
+
+        .tools > button.drag-tool {
+            cursor: move !important;
+        }
+
+        .help-text {
+            font-size: 14px;
+            line-height: 18px;
+        }
+
+        .delete {
+            font-size: 14px;
+            line-height: 16px;
+        }
+
+        .step-2 > .bg-white, .step-3 > .bg-white{
+            padding: 30px 20px;
+        }
+
+        .step-2 > .card {
+            max-width: 400px;
+        }
+
+        .step-3 > .card {
+            max-width: 700px;
+        }
+
+        .template-options {
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .template-options > button {
+            width: 130px;
+            height: 160px;
+            border: 1px solid gray;
+
+            padding: 10px;
+        }
+
+        .template-options > button > img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .template-options > button:hover {
+            border: 3px solid #040057;
+        }
+
+        .template-options > button.selected {
+            border: 3px solid #040057;
+        }
+
+        .card-heading {
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 22px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .flex-choices {
+            display: flex;
+            align-content: flex-start;
+            flex-direction: row;
+            gap: 10px;
+            flex-wrap: wrap;
+
+            margin: 20px 0;
+        }
+
+        .flex-choices > button {
+            font-size: 14px;
+            line-height: 16px;
+            padding: 10px 14px;
+            outline: 1px solid gray;
+        }
+
+        .flex-choices > button:hover {
+            background: #71356b20;
+        }
+
+        .flex-choices > button.selected {
+            background: #040057;
+            color: white;
+            outline: 1px solid #040057;
+        }
+
+        .form-input {
+            display: flex;
+            flex-direction: column;
+            align-content: start;
+            align-items: start;
+
+            margin-bottom: 16px;
+        }
+
+        .form-input > input:focus, .form-input > textarea:focus {
+            border: 1px solid #040057;
+            outline: none;
+        }
+
+        .form-input > label {
+            font-size: 14px;
+            line-height: 18px;
+        }
+
+        .form-input > input, .form-input > textarea {
+            border: 1px solid #04005780;
+            width: 280px;
+            font-size: 14px;
+            line-height: 18px;
+        }
+
+        .form-input > input.short {
+            width: 140px;
+        }
+
+        .form-input > textarea {
+            height: 86px;
+        }
+
+        .form-input > .error-text {
+            font-size: 14px;
+            line-height: 18px;
+        }
+
+        .form-submit {
+            background: #040057;
+            color: #fefefe;
+
+            font-size: 14px;
+            line-height: 18px;
+
+            padding: 10px 14px;
+
+            border: none;
+        }
+
+        .form-submit:hover {
+            background: #5b6f6e;
+        }
+
+        .inline-image {
+            margin-left: 10px;
+        }
+
+        .inline-image > img {
+            margin-bottom: -2px;
+        }
+
+        /* Canvas */
+        .step-content {
+            width: 100%;
+            height: 80%;
+
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+
+            color: #040057;
+        }
+
+        .step-1 {
+            gap: 20px;
+        }
+
+        .step-1 > button {
+            width: 200px;
+            height: 200px;
+
+            background: #ffffff;
+        }
+
+        .step-1 > button {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid transparent;
+        }
+
+        .step-1 > button:hover {
+            border: 4px solid #040057;
+        }
+
+        .step-1 > button.disabled:hover {
+            border: 4px solid transparent;
+        }
+
+        .step-1 > button.selected {
+            border: 4px solid #040057;
+        }
+
+        .canvas-area {
+            width: 0;
+            height: 0;
+            margin: 40px auto;
+            color: #000000;
+            background-image: linear-gradient(#ffdda4, #ffbe72);
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: relative;
+            box-shadow: 0px 12px 24px rgba(82, 121, 184, 0.15);
+        }
+
+        .canvas-area > div {
+            font-family: "Raleway", serif;
+            line-height: 1.5;
+        }
+
+        .canvas-area > div, .canvas-area > img {
+            position: absolute;
+        }
+
+        .canvas-area > div:hover, .canvas-area > img:hover {
+            outline: 1px dotted #555555;
+        }
+
+        .form-input > input[type="number"] {
+            width: 100px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            align-content: flex-start;
+        }
+
+        .content-suggestions {
+            margin-top: 20px;
+            list-style: none;
+            text-decoration: none;
+            padding-left: 0;
+            margin-left: 0;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .content-suggestions > li {
+            margin-right: 14px;
+            padding: 14px 18px;
+            font-size: 14px;
+            line-height: 18px;
+            background-color: #040057;
+            color: #efefef;
+            margin-bottom: 6px;
+            cursor: pointer;
+        }
+
+        .image-container {
+            object-fit: contain;
+        }
+
+        #compose_spinner {
+            top: 20px;
+            right: 20px;
+            position: absolute;
+        }
+    </style>
+{% endblock head %}
+
+{% block foot %}
+    <script>
+        let AVAILABLE_TEMPLATES = {
+            '1': {'src': 'https://storage.googleapis.com/random-public-assets/template-thumbnails/template_thumb_1.png', 'repr': `{"id":"abc123","type":"poster","workflow":"Event","title":"Christmas Party Invitation","description":"A poster for a Christmas Party with a gift ","background":"url(\\"https://images.unsplash.com/photo-1506143925201-0252c51780b0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=435&q=80\\")","sections":[{"id":"eid_1","type":"text","styles":"top: 43px; left: 122px; padding: 20px; font-family: \\"Homemade Apple\\"; font-size: 38px;","prompt":"","selected_content":"You're Invited","title":""},{"id":"eid_2","type":"text","styles":"top: 145.988px; left: 117.488px; padding: 20px; font-family: \\"Open Sans\\"; font-size: 42px; font-weight: 600; color: rgb(48, 0, 43);","prompt":"","selected_content":"Christmas Party","title":""},{"id":"eid_3","type":"text","styles":"top: 236.992px; left: 190.984px; padding: 20px; font-weight: 600; font-family: \\"Open Sans\\"; font-size: 24px;","prompt":"","selected_content":"December 25","title":""},{"id":"eid_6","type":"image","styles":"top: 382.758px; left: 234.992px; width: 100px; height: 100px;","prompt":"","selected_content":"https://cdn.iconscout.com/icon/free/png-256/christmas-gift-25-542814.png","title":""},{"id":"eid_4","type":"text","styles":"top: 530.73px; left: 56.9844px; padding: 20px; font-family: Lato; font-size: 20px; color: rgb(90, 0, 43);","prompt":"","selected_content":"We will be having a gift exchange, so bring a gift!","title":""},{"id":"eid_5","type":"text","styles":"top: 768.762px; left: 176.996px; padding: 20px; font-family: Lato;","prompt":"","selected_content":"RSVP by December 20","title":""}],"get_response":3}`},
+            '2': {'src': 'https://storage.googleapis.com/random-public-assets/template-thumbnails/template_thumb_2.png', 'repr': '{"id":"abc123","type":"poster","workflow":"Menu","title":"Dinner Menu","description":"Menu for a special event at a restaurant","background":"url(\\"https://images.unsplash.com/photo-1586075010923-2dd4570fb338?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80\\")","sections":[{"id":"eid_1","type":"text","styles":"top: 29px; left: 211.5px; padding: 20px; font-family: \\"Playfair Display\\"; font-size: 35px;","prompt":"","selected_content":"Menu","title":""},{"id":"eid_2","type":"text","styles":"top: 163px; left: 37.5px; padding: 20px; font-size: 31px; font-family: Lato;","prompt":"","selected_content":"Beef Steak","title":""},{"id":"eid_3","type":"text","styles":"top: 200px; left: 37.5px; padding: 20px; width: 340px; font-family: \\"Josefin Slab\\";","prompt":"","selected_content":"cooked slowly at low temperatures, allowing the meat to become tender","title":""},{"id":"eid_4","type":"text","styles":"top: 316px; left: 32.5px; padding: 20px; font-size: 31px; font-family: Lato;","prompt":"","selected_content":"Corn Soup","title":""},{"id":"eid_5","type":"text","styles":"top: 364px; left: 34.5px; padding: 20px; width: 340px; font-family: \\"Josefin Slab\\";","prompt":"","selected_content":"type of thick corn based soup or chowder, similar to New England clam chowder, with corn","title":""},{"id":"eid_6","type":"text","styles":"top: 519.328px; left: 34.5px; padding: 20px; font-size: 31px; font-family: Lato;","prompt":"","selected_content":"Garlic Shrimp","title":""},{"id":"eid_7","type":"text","styles":"top: 567.328px; left: 34.5px; padding: 20px; width: 340px; font-family: \\"Josefin Slab\\";","prompt":"","selected_content":"seafood dish consisting of various types and preparation of clam which are cooked by steaming","title":""}],"get_response":5}'},
+            '3': {'src': 'https://storage.googleapis.com/random-public-assets/template-thumbnails/template_thumb_3.png', 'repr': '{"id":"abc123","type":"poster","workflow":"Business","title":"Opening of a boutique","description":"Grand opening of a local boutique shop with date, time, address, and website url.","background":"url(\\"https://images.unsplash.com/photo-1568738351265-c7065f5d4293?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80\\")","sections":[{"id":"eid_1","type":"text","styles":"top: 81px; left: 186.973px; padding: 20px; font-size: 24px;","prompt":"","selected_content":"Enjoy with us","title":""},{"id":"eid_2","type":"text","styles":"top: 234.996px; left: 200.988px; padding: 20px; font-size: 32px;","prompt":"","selected_content":"GRAND","title":""},{"id":"eid_3","type":"text","styles":"top: 287.004px; left: 162.996px; padding: 20px; font-size: 42px;","prompt":"","selected_content":"OPENING","title":""},{"id":"eid_4","type":"text","styles":"top: 433.008px; left: 129.984px; padding: 20px; font-size: 24px;","prompt":"","selected_content":"Wednesday, August 22","title":""},{"id":"eid_5","type":"text","styles":"top: 561.762px; left: 173.977px; padding: 20px;","prompt":"","selected_content":"123, Peachtree Ave","title":""},{"id":"eid_6","type":"text","styles":"top: 685.758px; left: 171.98px; padding: 20px;","prompt":"","selected_content":"www.newcastle.com","title":""}],"get_response":5}'},
+            '4': {'src': 'https://storage.googleapis.com/random-public-assets/template-thumbnails/template_thumb_4.png', 'repr': '{"id":"abc123","type":"poster","workflow":"Product","title":"Organic Hair Oil","description":"An organic hair oil product with ingredients like olive oil, aloe vera and rosemary oil.","background":"linear-gradient(rgb(255, 221, 164), rgb(255, 190, 114))","sections":[{"id":"eid_1","type":"text","styles":"top: 79.0078px; left: 190.984px; padding: 20px; font-family: Oswald; font-size: 32px;","prompt":"","selected_content":"Hair Serum","title":""},{"id":"eid_2","type":"text","styles":"top: 147.012px; left: 227.984px; padding: 20px; font-family: Oswald;","prompt":"","selected_content":"Organic","title":""},{"id":"eid_3","type":"image","styles":"top: 267.008px; left: 174.992px; width: 200px; height: 200px;","prompt":"","selected_content":"https://media-public.canva.com/go_ek/MAEecXgo_ek/1/s.png","title":""},{"id":"eid_4","type":"text","styles":"top: 545.25px; left: 49.9883px; padding: 20px;","prompt":"","selected_content":"Olive Oil","title":""},{"id":"eid_5","type":"text","styles":"top: 545.262px; left: 212.996px; padding: 20px;","prompt":"","selected_content":"Aloe Vera","title":""},{"id":"eid_6","type":"text","styles":"top: 545.262px; left: 349.996px; padding: 20px;","prompt":"","selected_content":"Rosemary Oil","title":""},{"id":"eid_7","type":"text","styles":"top: 689.262px; left: 165.996px; padding: 20px;","prompt":"","selected_content":"www.hairserum.com","title":""}],"get_response":6}'}
+        }
+
+        let editPanel = $('#edit_panel');
+
+        let POSTER_WIDTH = 570;
+        let POSTER_HEIGHT = 880;
+        let EMAIL_WIDTH = 570;
+
+        let repr = {
+            'id': 'abc123',
+        }
+
+        /* Accordion */
+        let step1 = $('#step1');
+        let step2 = $('#step2');
+        let step3 = $('#step3');
+        let step4 = $('#step4');
+        let stepButtons = $('.step-button');
+
+        let contentSuggestions = $('#content_suggestions');
+
+        /*
+        $('.accordion').on('click', function() {
+            $(this).toggleClass('active');
+            let panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+                panel.style.padding = 0;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + 'px';
+                panel.style.padding = '20px 0';
+            }
+        });
+         */
+
+
+        stepButtons.on('click', function() {
+            stepButtons.removeClass('selected');
+            $(this).addClass('selected');
+            $('.step-content').addClass('display-none');
+        })
+
+        step1.on('click', function() {
+            // Show the step-1 section
+            $('.step-1').removeClass('display-none');
+        });
+        step2.on('click', function() {
+            $('.step-2').removeClass('display-none');
+        });
+        step3.on('click', function() {
+            $('.step-3').removeClass('display-none');
+        });
+        step4.on('click', function() {
+            $('.step-4').removeClass('display-none');
+        })
+
+        /* On page load */
+
+        $(function() {
+            step1.click();
+            step2.addClass('disabled');
+            step3.addClass('disabled');
+            step4.addClass('disabled');
+
+            setupTemplateChoices();
+            editPanel.draggable();
+
+            setupFontOptions();
+        });
+
+        let templateOptions = $('#template_options');
+        function setupTemplateChoices() {
+            templateOptions.empty();
+            $.each(AVAILABLE_TEMPLATES, function(template_id, value) {
+                templateOptions.append($('<button>', {
+                    'id': 'template_' + template_id,
+                    'class': 'no-defaults'
+                }).append($('<img />', {
+                    'src': value['src']
+                })));
+            });
+        }
+
+        function setupFontOptions() {
+            FONT_FAMILIES.forEach(function(fontFamily) {
+                textFont.append($('<option>', {
+                    'value': fontFamily,
+                    'text': fontFamily,
+                }));
+            });
+        }
+
+
+        /* Type */
+        let TYPE_EMAIL = 'email';
+        let TYPE_POSTER = 'poster';
+
+
+        function changeType(type) {
+            // We just added a new type, go to the next section
+            repr['type'] = type;
+
+            setupWorkflowChoices(type);
+
+            step2.removeClass('disabled');
+            step2.click();
+        }
+
+        $('#email, #poster').on('click', function() {
+            $(this).addClass('selected');
+            changeType(this.id);
+        });
+
+        /* Compose defs - logic comes later */
+        let compose = $('#compose');
+        let projectTitle = $('#project_title');
+        let projectDescription = $('#project_description');
+        let missingTitle = $('#missing_title');
+        let missingDescription = $('#missing_description');
+
+        /* Workflow */
+        let EMAIL_WORKFLOWS = [
+            'Event',
+            'Contest',
+            'Sales (cold emails)',
+            'Product/Feature',
+            'Sale',
+            'Wedding Invite'
+        ];
+        let POSTER_WORKFLOWS = [
+            'Event',
+            'Business',
+            'Product',
+            'Contest',
+            'Menu',
+            'Wedding'
+        ];
+
+        let EMAIL_EXAMPLES = [
+            'An in-person conference on Dermatology for healthcare providers over 2 days. Early bird discounts on tickets.',
+            'An ai powered virtual hackathon, open to anyone in the world, large cash prizes. The theme is AI powered.',
+            'Koel can empower your sales and marketing team with AI powered emails and posters.',
+            'Introducing Koel talk, a voice powered assistant for the Amazon android application. With it you can listen to music, watch tv, and shop while on the move completely handsfree.',
+            'Limited time online black friday sale featuring 2 products with huge discounts.',
+            'A destination wedding invitation for Viraj & Parav.',
+        ]
+        let POSTER_EXAMPLES = [
+            'An in-person conference on Dermatology for healthcare providers over 2 days. Early bird discounts on tickets.',
+            'Grand opening of a local sandwich restaurant. Early birds eat for free.',
+            'Koel, the ultimate assistant for composing emails, and posters. Get started for free.',
+            'An ai powered virtual hackathon, open to anyone in the world, large cash prizes. The theme is AI powered.',
+            'Menu for a fast food restaurant including a section for a kids menu.',
+            'A destination wedding announcement for Viraj & Parav.',
+        ]
+
+        let workflowChoices = $('#workflow_choices');
+        let currentWorkflowType = null;
+
+        let missingWorkflow = $('#missing_workflow');
+
+        function setupWorkflowChoices(type) {
+            if (currentWorkflowType === type) {
+                // Do nothing, the type is the same
+                return;
+            }
+            currentWorkflowType = type;
+
+            let choiceOptions;
+            if (type === TYPE_EMAIL) {
+                choiceOptions = EMAIL_WORKFLOWS;
+            } else {
+                choiceOptions = POSTER_WORKFLOWS;
+            }
+
+            // Setting the choices
+
+            workflowChoices.empty();
+
+            choiceOptions.forEach(function (choice, index) {
+                workflowChoices.append($('<button>', {
+                    id: 'workflow_' + index,
+                    'class': 'no-defaults',
+                    'text': choice
+                }));
+            });
+        }
+
+        workflowChoices.on('click', 'button', function() {
+            $(this).addClass('selected').siblings().removeClass('selected');
+
+            let workflowIndex = '' + this.id.split('_').pop();
+            changeWorkflow(parseInt(workflowIndex));
+        });
+
+        function changeWorkflow(workflowIndex) {
+            // We just added a new workflow, auto open the next section
+            let hints;
+            if (repr['type'] === TYPE_EMAIL) {
+                repr['workflow'] = EMAIL_WORKFLOWS[workflowIndex];
+                hints = EMAIL_EXAMPLES;
+            } else {
+                repr['workflow'] = POSTER_WORKFLOWS[workflowIndex];
+                hints = POSTER_EXAMPLES;
+            }
+
+            // Updating step 3's hint text
+            let hint;
+            if (0 < workflowIndex <= hints.length) {
+                hint = hints[workflowIndex];
+            } else {
+                hint = hints[0];
+            }
+            projectDescription.attr('placeholder', hint);
+        }
+
+        /* Details */
+        let composeSpinner = $('#compose_spinner');
+        let canvasArea = $('#canvas_area');
+
+        compose.on('click', function() {
+            let mTitle = projectTitle.val();
+            let mDescription = projectDescription.val();
+
+            missingTitle.addClass('display-none');
+            missingDescription.addClass('display-none');
+            missingWorkflow.addClass('display-none');
+
+            let errors = false;
+            if (!('workflow' in repr)) {
+                missingWorkflow.removeClass('display-none');
+                errors = true;
+            }
+            if (!mTitle) {
+                missingTitle.removeClass('display-none');
+                errors = true;
+            }
+            if (!mDescription) {
+                missingDescription.removeClass('display-none');
+                errors = true;
+            }
+            if (errors) {
+                return;
+            }
+
+            repr['title'] = mTitle;
+            repr['description'] = mDescription;
+
+            // Go to the next section
+            step3.removeClass('disabled');
+            step3.click();
+        });
+
+        /* Templates */
+        let selectedTemplate = '1';
+        templateOptions.on('click', 'button', function() {
+            selectedTemplate = this.id.split('_').pop();
+            $(this).addClass('selected');
+
+            // Start composing
+            step4.removeClass('disabled');
+            step4.click();
+            beginCompose();
+        });
+
+        function beginCompose() {
+            $('#tools').removeClass('display-none');
+
+            doInitialCompose();
+        }
+
+        function showSpinner() {
+            composeSpinner.removeClass('display-none');
+        }
+
+        function hideSpinner() {
+            composeSpinner.addClass('display-none');
+        }
+
+        function doInitialCompose() {
+            if (repr['type'] === TYPE_POSTER) {
+                canvasArea.css({'width': POSTER_WIDTH + 'px', 'height': POSTER_HEIGHT + 'px'});
+            } else {
+                canvasArea.css({'width': EMAIL_WIDTH + 'px', 'height': '100%'});
+            }
+
+            // Setting the template
+            if (selectedTemplate) {
+                if (AVAILABLE_TEMPLATES[selectedTemplate]['repr']) {
+                    let templateRepr = JSON.parse(AVAILABLE_TEMPLATES[selectedTemplate]['repr']);
+                    repr['background'] = templateRepr['background'];
+                    repr['sections'] = templateRepr['sections'];
+                    fromRepr();
+                }
+            }
+
+            aiGenerateTemplate();
+        }
+
+        /* Handling page tools */
+        let backgroundTool = $('#tool_background');
+        let bgStart = $('#bg_gradient_start');
+        let bgEnd = $('#bg_gradient_end');
+        let bgDirection = $('#bg_gradient_direction');
+        let bgSRC = $('#bg_src');
+
+        backgroundTool.on('click', function() {
+            showEditPanel();
+
+            commonStuff(null);
+
+            $('#background_form').removeClass('display-none');
+
+            let currentBackgroundImage = canvasArea.css('background-image');
+            if (currentBackgroundImage.includes('linear-gradient')) {
+                /* Not showing current vals, this is super involved */
+                // Is of type gradient linear-gradient(to bottom right, rgb(100, 20, 1), #166669);
+                /*
+                let sliced = currentBackgroundImage.slice(16, currentBackgroundImage.length - 1);
+                let finalItems = sliced.split(', ');
+                bgStart.val(finalItems[1]);
+                bgEnd.val(finalItems[2]);
+                bgDirection.val(finalItems[0]);
+                 */
+            } else {
+                // Is of type image url("/w3images/photographer.jpg");
+                let sliced = currentBackgroundImage.slice(5, currentBackgroundImage.length - 2);
+                bgSRC.val(sliced);
+            }
+        });
+
+        bgStart.on('input', function() {
+            gradientInput();
+        });
+        bgEnd.on('input', function() {
+            gradientInput();
+        });
+        bgDirection.on('input', function() {
+            gradientInput();
+        });
+        bgSRC.on('input', function() {
+            canvasArea.css('background-image', 'url("' + bgSRC.val() + '")');
+        });
+        function gradientInput() {
+            let start = bgStart.val();
+            let end = bgEnd.val();
+            let direction = bgDirection.val();
+
+            if (start !== null && end !== null) {
+                let mProp = start + ', ' + end;
+                if (direction) {
+                    mProp = direction + ', ' + mProp;
+                }
+                canvasArea.css('background-image', 'linear-gradient(' + mProp + ')');
+            }
+        }
+
+
+        /* Handling dragging */
+        let elementIDCount = 0;
+
+        // Spawn an element of the type of tool that is dropped onto the canvas
+        // https://web.dev/drag-and-drop/#:~:text=To%20make%20an%20object%20draggable,any%20markup%20on%20your%20page.
+        let draggableTools = document.querySelectorAll('.drag-tool');
+        draggableTools.forEach(function (draggableTool) {
+            draggableTool.addEventListener('dragstart', handleDragStart);
+            draggableTool.addEventListener('dragend', handleDragEnd);
+        });
+
+        function handleDragStart(e) {
+        }
+
+        function handleDragEnd(e) {
+            elementIDCount += 1;
+            let canvasOffset = canvasArea.offset()
+            let mTop = e.y - canvasOffset['top'];
+            let mLeft = e.x - canvasOffset['left'];
+
+            if (e.target.id === 'tool_text') {
+                /* Append a draggable text element at this position */
+                let mTextArea = $('<div>', {
+                    'id': 'eid_' + elementIDCount,
+                    'style': 'top: ' + mTop + 'px; left: ' + mLeft + 'px; padding: 20px;',
+                    'text': 'New text area ' + elementIDCount,
+                    'class': 'text-container'
+                });
+                canvasArea.append(mTextArea);
+                mTextArea.draggable({
+                    containment: '#canvas_area',
+                    scroll: false
+                });
+                mTextArea.click();
+            }
+
+            if (e.target.id === 'tool_image') {
+                /* Append a draggable image element at this position */
+                let mImageArea = $('<img />', {
+                    'id': 'eid_' + elementIDCount,
+                    'style': 'top: ' + mTop + 'px; left: ' + mLeft + 'px; width: 100px; height: 100px;',
+                    'class': 'image-container',
+                    'src': 'https://storage.googleapis.com/random-public-assets/koel-composer/image_placeholder_color.svg'
+                });
+                canvasArea.append(mImageArea);
+                mImageArea.draggable({
+                    containment: '#canvas_area',
+                    scroll: false
+                });
+                mImageArea.click();
+            }
+        }
+
+        /* Handling dynamic elements */
+        let selectedContainer = null;
+
+        // Form elements
+        let textContent = $('#text_content');
+        let textSize = $('#text_size');
+        let textWeight = $('#text_weight');
+        let textBackground = $('#text_background');
+        let textRotation = $('#text_rotation');
+        let textWidth = $('#text_width');
+        let textHeight = $('#text_height');
+        let textAlign = $('#text_align');
+        let textColor = $('#text_color');
+        let textFont = $('#text_font');
+
+        function showEditPanel() {
+            editPanel.removeClass('display-none');
+        }
+
+        function hideEditPanel() {
+            editPanel.addClass('display-none');
+        }
+
+        $('#close_edit_panel').on('click', function() {
+            hideEditPanel();
+        });
+
+        canvasArea.on('click', '.text-container', function() {
+            // Clicked a text container
+            showEditPanel();
+            let thisElement = $(this);
+
+            commonStuff(thisElement);
+
+            $('#text_area_form').removeClass('display-none');
+            contentSuggestions.addClass('display-none');
+
+            // Filling in with the current content
+            textContent.val(thisElement.text());
+            let cFontSize = thisElement.css('font-size');
+            textSize.val(cFontSize.split('px')[0]);
+            textWeight.val(thisElement.css('font-weight'));
+            textBackground.val(thisElement.css('background-color'));
+            textColor.val(thisElement.css('color'));
+            textRotation.val(thisElement.css('transform'));
+            textWidth.val(thisElement.css('width').split('px')[0]);
+            textHeight.val(thisElement.css('height').split('px')[0]);
+            textAlign.val(thisElement.css('text-align'));
+            textFont.val(thisElement.css('font-family'));
+
+            getContentSuggestions(thisElement);
+        });
+
+        function getContentSuggestions(thisElement) {
+            // Getting content suggestions
+            updateRepr();
+            let selectedIndex = 0;
+            repr['sections'].forEach(function(choice, index) {
+                if (choice['id'] === thisElement.attr('id')) {
+                    selectedIndex = index;
+                }
+            });
+            repr['get_response'] = selectedIndex;
+
+            // Getting options
+            ajaxGetTextOptions();
+        }
+
+        textContent.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.text(textContent.val());
+            }
+        });
+        textSize.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('font-size', textSize.val() + 'px');
+            }
+        });
+        textWeight.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('font-weight', textWeight.val());
+            }
+        });
+        textBackground.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('background-color', textBackground.val());
+            }
+        });
+        textColor.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('color', textColor.val());
+            }
+        });
+        textRotation.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('transform', textRotation.val());
+            }
+        });
+        textWidth.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('width', textWidth.val() + 'px');
+            }
+        });
+        textHeight.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('height', textHeight.val() + 'px');
+            }
+        });
+        textAlign.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('text-align', textAlign.val());
+            }
+        });
+        textFont.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('font-family', textFont.val());
+            }
+        });
+
+        contentSuggestions.on('click', 'li', function() {
+            textContent.val($(this).text()).trigger('input');
+        });
+
+        // Image form elements
+        let imageContent = $('#image_content');
+        let imageRotation = $('#image_rotation');
+        let imageWidth = $('#image_width');
+        let imageHeight = $('#image_height');
+
+        canvasArea.on('click', '.image-container', function() {
+            // Clicked an image
+            showEditPanel();
+            let thisElement = $(this);
+
+            commonStuff(thisElement);
+
+            $('#image_area_form').removeClass('display-none');
+
+            // Fill in the current content
+            imageContent.val(thisElement.attr('src'));
+            imageRotation.val(thisElement.css('transform'));
+            imageWidth.val(thisElement.css('width').split('px')[0]);
+            imageHeight.val(thisElement.css('height').split('px')[0]);
+        });
+
+        imageContent.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.attr('src', imageContent.val());
+            }
+        });
+        imageRotation.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('transform', imageRotation.val());
+            }
+        });
+        imageWidth.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('width', imageWidth.val() + 'px');
+            }
+        });
+        imageHeight.on('input', function() {
+            if (selectedContainer) {
+                selectedContainer.css('height', imageHeight.val() + 'px');
+            }
+        })
+
+
+        function commonStuff(mSelectedContainer) {
+            $('.area-form').addClass('display-none');
+            selectedContainer = mSelectedContainer;
+        }
+
+        function updateRepr() {
+            repr['background'] = canvasArea.css('background-image');
+            // Creating the sections
+            let sections = [];
+
+            canvasArea.children().each(function() {
+                // TODO: Order by top position
+                let child = $(this);
+                let content;
+                if (child.attr('src')) {
+                    content = child.attr('src');
+                } else {
+                    content = child.text();
+                }
+                sections.push({
+                    'id': child.attr('id'),
+                    'type': ((child.prop('tagName') === 'IMG') ? 'image' : 'text'),
+                    'styles': child.attr('style'),
+                    'prompt': '',
+                    'selected_content': content,
+                    'title': ''
+                });
+            });
+
+            repr['sections'] = sections;
+        }
+
+        function fromRepr() {
+
+            canvasArea.empty();
+
+            if ('background' in repr) {
+                if (repr['background']) {
+                    canvasArea.css('background-image', repr['background']);
+                }
+            }
+
+            repr['sections'].forEach(function(section) {
+                if (section['type'] === 'image' ) {
+                    let mImageArea = $('<img />', {
+                        'id': section['id'],
+                        'style': section['styles'],
+                        'class': 'image-container',
+                        'src': section['selected_content']
+                    });
+                    canvasArea.append(mImageArea);
+                    mImageArea.draggable({
+                        containment: '#canvas_area',
+                        scroll: false
+                    });
+                } else if (section['type'] === 'text' ) {
+                    let mTextArea = $('<div>', {
+                        'id': section['id'],
+                        'style': section['styles'],
+                        'class': 'text-container',
+                        'text': section['selected_content']
+                    });
+                    canvasArea.append(mTextArea);
+                    mTextArea.draggable({
+                        containment: '#canvas_area',
+                        scroll: false
+                    });
+                }
+            });
+        }
+
+        let TEXT_RESPONSE_URL = ''
+
+        function aiGenerateTemplate() {
+            /* Calls our ai backend to generate a template */
+            showSpinner();
+
+            $.ajax({
+                type: 'POST',
+                url: 'https://ai-hackathon-371117.uc.r.appspot.com/generate-template',
+                data: mjson().replaceAll('\\"', ''),
+                contentType: 'application/json',
+                success: function(data, textStatus, jqXHR) {
+                    if ('sections' in data) {
+                        updateSections(data['sections']);
+                    }
+                    hideSpinner();
+                },
+                error: function() {
+                    console.log('Error generating template');
+                    hideSpinner();
+                }
+            });
+        }
+
+        function updateSections(rSections) {
+            /*
+            Adds as many sections as we can to existing text blocks in our canvas
+             */
+            let newSections = [];
+            let reprSections = repr['sections'];
+            reprSections.forEach(function (section) {
+                if (section['type'] === 'text' && rSections.length > 0) {
+                    let nContent = rSections.pop();
+                    if ('content' in nContent) {
+                        section['selected_content'] = nContent['content'];
+                    }
+                }
+                newSections.push(section);
+            });
+            console.log(newSections);
+            repr['sections'] = newSections;
+            fromRepr();
+        }
+
+        function ajaxGetTextOptions() {
+            showSpinner();
+
+            $.ajax({
+                type: 'POST',
+                url: 'https://ai-hackathon-371117.uc.r.appspot.com/generate',
+                data: mjson().replaceAll('\\"', ''),
+                contentType: 'application/json',
+                success: function(data) {
+
+                    // showOptions(mResponse['options']);
+                    if ('options' in data) {
+                        showOptions(data['options']);
+                    }
+
+                    hideSpinner();
+                },
+                error: function() {
+                    console.log('Error');
+                    hideSpinner();
+                }
+            });
+        }
+
+        function mjson() {
+            updateRepr();
+            return (JSON.stringify(repr));
+        }
+
+        function showOptions(choices) {
+            let max_suggestions = 4;
+            contentSuggestions.empty();
+            contentSuggestions.removeClass('display-none');
+
+            choices.forEach(function (item, index) {
+                if (index < max_suggestions) {
+                    console.log(item);
+                    contentSuggestions.append($('<li>', {'text': item}));
+                }
+            });
+        }
+
+        $('.delete').on('click', function() {
+            if (selectedContainer) {
+                // Close the container and delete it
+                $('#close_edit_panel').click();
+                selectedContainer.remove();
+                selectedContainer = null;
+            }
+        });
+
+    </script>
+{% endblock foot %}
